@@ -23,8 +23,8 @@
         </button>
         <RouterLink 
           v-if="isLoggedIn"
-          :to="`/${userRole}/umkm/${id}/edit`" 
-          class="px-5 py-2.5 bg-gradient-to-r from-[#F59E0B] to-[#FBBF24] hover:shadow-lg hover:shadow-[#F59E0B]/20 text-[#111315] rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5"
+          :to="`/admin/umkm/${id}/edit`" 
+          class="px-5 py-2.5 bg-[#F59E0B] hover:shadow-lg hover:shadow-amber-500/20 text-[#111315] rounded-xl text-xs font-bold transition-all flex items-center space-x-1.5"
         >
           <Edit class="w-4 h-4" />
           <span>Ubah Data</span>
@@ -146,7 +146,7 @@
           </div>
         </div>
 
-        <div class="bg-gradient-to-br from-[#F59E0B]/10 to-transparent border border-[#F59E0B]/20 dark:border-[#F59E0B]/10 rounded-3xl p-6 relative overflow-hidden">
+        <div class="bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/10 rounded-3xl p-6 relative overflow-hidden">
           <div class="absolute -right-4 -top-4 w-24 h-24 bg-[#F59E0B]/20 rounded-full blur-2xl"></div>
           
           <h3 class="font-extrabold text-[15px] tracking-wide text-slate-800 dark:text-white border-b border-slate-200/50 dark:border-[#2A2E33]/50 pb-3 mb-5 flex items-center space-x-2">
@@ -222,10 +222,6 @@ const router = useRouter();
 const { isDark, toggleTheme } = useTheme();
 
 const isLoggedIn = ref(!!localStorage.getItem('auth_token'));
-const userRole = computed(() => {
-  const s = localStorage.getItem('user_info');
-  return s ? JSON.parse(s).role : 'petugas';
-});
 
 const umkm = ref<any>(null);
 const loading = ref(true);
@@ -385,7 +381,7 @@ function getPotentialBg(level: string): string {
 
 function goBack() {
   if (isLoggedIn.value) {
-    router.push(`/${userRole.value}/umkm`);
+    router.push('/admin/umkm');
   } else {
     router.push('/');
   }

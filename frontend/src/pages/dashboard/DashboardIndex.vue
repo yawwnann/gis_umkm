@@ -1,401 +1,305 @@
 <template>
-  <div class="w-full flex flex-col font-sans">
+  <div class="w-full flex flex-col font-sans space-y-4">
 
-    <!-- Top Grid: existing 3 panels -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-6 shrink-0">
-
-      <!-- Panel 1: Data Overview -->
-      <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 p-5 rounded-2xl shadow-xl flex flex-col justify-between pointer-events-auto">
-        <div class="flex items-center justify-between mb-3">
-          <h3 class="text-xl font-bold flex items-center space-x-2 text-slate-800 dark:text-white">
-            <div class="h-6 w-6 bg-[#F59E0B]/20 rounded flex items-center justify-center">
-              <Store class="h-4 w-4 text-[#F59E0B]" />
-            </div>
-            <span>Data Overview</span>
-          </h3>
-          <div class="flex items-center space-x-1.5">
-            <RouterLink to="/dashboard/by-village" class="p-1.5 hover:bg-slate-100 dark:hover:bg-[#22262A] rounded-lg transition-colors text-slate-400 dark:text-[#6F767E]" title="Lihat Statistik">
-              <SlidersHorizontal class="h-3.5 w-3.5" />
-            </RouterLink>
-            <RouterLink to="/dashboard/by-category" class="p-1.5 hover:bg-slate-100 dark:hover:bg-[#22262A] rounded-lg transition-colors text-slate-400 dark:text-[#6F767E]" title="Lihat Kategori">
-              <CalendarDays class="h-3.5 w-3.5" />
-            </RouterLink>
+    <!-- Header Stats Row -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="bg-amber-500 rounded-xl p-4 text-white shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-xs opacity-80 font-medium">Total UMKM</p>
+            <p class="text-2xl font-bold mt-1">{{ loading ? '...' : stats?.total_umkm || 0 }}</p>
+          </div>
+          <div class="h-10 w-10 bg-white/20 rounded-lg flex items-center justify-center">
+            <Store class="h-5 w-5" />
           </div>
         </div>
+        <p class="text-[10px] mt-2 opacity-70">UMKM Kuliner Sungailiat</p>
+      </div>
 
-        <div>
-          <div class="mb-1">
-            <span class="text-[36px] font-extrabold text-slate-900 dark:text-white leading-none">{{ loading ? '...' : stats?.total_umkm }}</span>
-            <span class="text-[36px] font-extrabold text-slate-300 dark:text-[#6F767E]">.{{ loading ? '' : '00' }}</span>
+      <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-xl p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-[10px] text-slate-400 dark:text-[#6F767E] font-medium uppercase tracking-wider">Kategori</p>
+            <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">{{ loading ? '...' : stats?.total_categories || 0 }}</p>
           </div>
-
-          <div class="flex items-center space-x-3 mb-6">
-            <span class="text-sm text-slate-500 dark:text-[#6F767E] font-medium">UMKM Kuliner Sungailiat</span>
-            <span class="text-xs font-bold px-2 py-0.5 rounded bg-[#F59E0B]/20 text-[#D97706] dark:text-[#F59E0B]">+100%</span>
-          </div>
-
-          <div class="flex items-end h-24 space-x-1">
-            <div v-for="(h, i) in barHeights" :key="i"
-              class="flex-1 rounded-t-sm transition-all duration-500"
-              :class="i === activeBarIndex ? 'bg-slate-600 dark:bg-white' : 'bg-slate-200 dark:bg-[#2A2E33]'"
-              :style="{ height: h + '%' }"
-            ></div>
-          </div>
-          <div class="flex justify-between mt-2">
-            <span v-for="label in barLabels" :key="label" class="text-xs text-slate-400 dark:text-[#6F767E]">{{ label }}</span>
+          <div class="h-10 w-10 bg-indigo-500/10 rounded-lg flex items-center justify-center">
+            <PieChart class="h-5 w-5 text-indigo-500" />
           </div>
         </div>
       </div>
 
-      <!-- Panel 2: Activity -->
-      <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 p-5 rounded-2xl shadow-xl flex flex-col pointer-events-auto">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-xl font-bold flex items-center space-x-2 text-slate-800 dark:text-white">
-            <Activity class="h-5 w-5 text-[#F59E0B]" />
-            <span>Sebaran Data</span>
-          </h3>
-          <span class="text-xs text-slate-400 dark:text-[#6F767E] font-medium">{{ todayLabel }}</span>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4 flex-1">
-          <div class="bg-slate-50/60 dark:bg-[#111315]/60 border border-slate-100 dark:border-[#2A2E33] p-3.5 rounded-xl">
-            <span class="text-xs text-slate-500 dark:text-[#6F767E] font-medium">Total Kategori</span>
-            <div class="flex items-center space-x-2 mt-1">
-              <span class="text-xl font-extrabold text-slate-800 dark:text-white">{{ loading ? '...' : stats?.total_categories }}</span>
-              <div class="flex items-end h-6 space-x-[2px] flex-1">
-                <div v-for="n in 5" :key="n" class="flex-1 bg-slate-200 dark:bg-[#2A2E33] rounded-t-sm" :style="{ height: (20 + n * 12) + '%' }"></div>
-              </div>
-            </div>
+      <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-xl p-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-[10px] text-slate-400 dark:text-[#6F767E] font-medium uppercase tracking-wider">Kelurahan</p>
+            <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">{{ loading ? '...' : stats?.total_villages || 0 }}</p>
           </div>
-
-          <div class="bg-slate-50/60 dark:bg-[#111315]/60 border border-slate-100 dark:border-[#2A2E33] p-3.5 rounded-xl">
-            <span class="text-xs text-slate-500 dark:text-[#6F767E] font-medium">Kelurahan</span>
-            <div class="flex items-center space-x-2 mt-1">
-              <span class="text-xl font-extrabold text-slate-800 dark:text-white">{{ loading ? '...' : stats?.total_villages }}</span>
-              <svg class="h-5 flex-1 text-[#F59E0B]" preserveAspectRatio="none" viewBox="0 0 100 20" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M0,15 Q20,5 40,12 T80,8 T100,10" />
-              </svg>
-            </div>
-          </div>
-
-          <div class="bg-slate-50/60 dark:bg-[#111315]/60 border border-slate-100 dark:border-[#2A2E33] p-3.5 rounded-xl">
-            <span class="text-xs text-slate-500 dark:text-[#6F767E] font-medium">Potensi Tinggi</span>
-            <div class="flex items-center space-x-2 mt-1">
-              <span class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">{{ loading ? '...' : stats?.by_potential?.tinggi || 0 }}</span>
-              <span class="text-xs text-slate-400 dark:text-[#6F767E]">UMKM</span>
-            </div>
-          </div>
-
-          <div class="bg-slate-50/60 dark:bg-[#111315]/60 border border-slate-100 dark:border-[#2A2E33] p-3.5 rounded-xl">
-            <span class="text-xs text-slate-500 dark:text-[#6F767E] font-medium">Potensi Rendah</span>
-            <div class="flex items-center space-x-2 mt-1">
-              <span class="text-xl font-extrabold text-rose-600 dark:text-rose-400">{{ loading ? '...' : stats?.by_potential?.rendah || 0 }}</span>
-              <span class="text-xs text-slate-400 dark:text-[#6F767E]">UMKM</span>
-            </div>
+          <div class="h-10 w-10 bg-emerald-500/10 rounded-lg flex items-center justify-center">
+            <MapPin class="h-5 w-5 text-emerald-500" />
           </div>
         </div>
       </div>
 
-      <!-- Panel 3: Total Performance -->
-      <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 p-5 rounded-2xl shadow-2xl pointer-events-auto">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="text-xl font-bold flex items-center space-x-2 text-slate-800 dark:text-white">
-            <TrendingUp class="h-5 w-5 text-[#F59E0B]" />
-            <span>Distribusi Potensi</span>
-          </h3>
-          <span class="text-xs text-slate-400 dark:text-[#6F767E] font-medium">{{ todayLabel }}</span>
-        </div>
-
-        <div class="flex items-center space-x-3 mb-4">
-          <span class="text-xs text-slate-500 dark:text-[#6F767E]">100%</span>
-          <div class="relative flex-1">
-            <div class="absolute right-[14%] -top-5 bg-[#F59E0B] text-[#111315] text-xs font-bold px-2 py-0.5 rounded-md">
-              {{ getPercentage(stats?.by_potential?.tinggi) }}%
-            </div>
-          </div>
-        </div>
-
-        <div class="relative h-24 mb-2">
-          <Line
-            v-if="monthlyRegistrations.length"
-            :data="chartData"
-            :options="chartOptions"
-            :key="isDark ? 'dark' : 'light'"
-          />
-        </div>
-
-        <div class="mt-5 space-y-3">
+      <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-xl p-4">
+        <div class="flex items-center justify-between">
           <div>
-            <div class="flex justify-between items-center mb-1">
-              <span class="text-xs font-semibold text-slate-600 dark:text-[#F0F0F0] flex items-center space-x-1.5">
-                <span class="h-2 w-2 bg-emerald-500 rounded-full inline-block"></span>
-                <span>Tinggi</span>
-              </span>
-              <span class="text-xs font-bold text-slate-800 dark:text-white">{{ stats?.by_potential?.tinggi || 0 }}</span>
-            </div>
-            <div class="w-full bg-slate-100 dark:bg-[#111315] h-1 rounded-full overflow-hidden">
-              <div class="bg-emerald-500 h-1 rounded-full transition-all duration-700" :style="{ width: getPercentage(stats?.by_potential?.tinggi) + '%' }"></div>
-            </div>
+            <p class="text-[10px] text-slate-400 dark:text-[#6F767E] font-medium uppercase tracking-wider">Rata-rata Skor</p>
+            <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">{{ loading ? '...' : (analysis.summary.avg_potential_score || 0) }}</p>
           </div>
-          <div>
-            <div class="flex justify-between items-center mb-1">
-              <span class="text-xs font-semibold text-slate-600 dark:text-[#F0F0F0] flex items-center space-x-1.5">
-                <span class="h-2 w-2 bg-amber-500 rounded-full inline-block"></span>
-                <span>Sedang</span>
-              </span>
-              <span class="text-xs font-bold text-slate-800 dark:text-white">{{ stats?.by_potential?.sedang || 0 }}</span>
-            </div>
-            <div class="w-full bg-slate-100 dark:bg-[#111315] h-1 rounded-full overflow-hidden">
-              <div class="bg-amber-500 h-1 rounded-full transition-all duration-700" :style="{ width: getPercentage(stats?.by_potential?.sedang) + '%' }"></div>
-            </div>
-          </div>
-          <div>
-            <div class="flex justify-between items-center mb-1">
-              <span class="text-xs font-semibold text-slate-600 dark:text-[#F0F0F0] flex items-center space-x-1.5">
-                <span class="h-2 w-2 bg-rose-500 rounded-full inline-block"></span>
-                <span>Rendah</span>
-              </span>
-              <span class="text-xs font-bold text-slate-800 dark:text-white">{{ stats?.by_potential?.rendah || 0 }}</span>
-            </div>
-            <div class="w-full bg-slate-100 dark:bg-[#111315] h-1 rounded-full overflow-hidden">
-              <div class="bg-rose-500 h-1 rounded-full transition-all duration-700" :style="{ width: getPercentage(stats?.by_potential?.rendah) + '%' }"></div>
-            </div>
+          <div class="h-10 w-10 bg-rose-500/10 rounded-lg flex items-center justify-center">
+            <TrendingUp class="h-5 w-5 text-rose-500" />
           </div>
         </div>
       </div>
-
     </div>
 
-    <!-- Analysis Section -->
-    <div v-if="!loadingAnalysis" class="space-y-6 pb-20">
+    <!-- Main Content Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
 
-      <!-- Key Metrics -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 pointer-events-auto">
-        <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 p-5 rounded-2xl shadow-xl">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-sm font-bold text-slate-400 dark:text-[#6F767E] uppercase tracking-wider">Total UMKM</span>
-            <div class="h-8 w-8 rounded-lg bg-[#F59E0B]/15 flex items-center justify-center">
-              <Store class="h-4 w-4 text-[#F59E0B]" />
+      <!-- Left Column: 2/3 width -->
+      <div class="lg:col-span-2 space-y-4">
+
+        <!-- Distribusi Potensi Section -->
+        <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center space-x-2">
+              <TrendingUp class="h-5 w-5 text-amber-500" />
+              <span>Distribusi Potensi UMKM</span>
+            </h3>
+            <span class="text-xs text-slate-400 dark:text-[#6F767E]">{{ todayLabel }}</span>
+          </div>
+
+          <!-- Potential Stats Cards -->
+          <div class="grid grid-cols-3 gap-3 mb-4">
+            <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 rounded-lg p-3">
+              <div class="flex items-center space-x-2 mb-1">
+                <span class="h-2.5 w-2.5 bg-emerald-500 rounded-full"></span>
+                <span class="text-xs font-semibold text-emerald-700 dark:text-emerald-400">Tinggi</span>
+              </div>
+              <div class="flex items-baseline justify-between">
+                <span class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">{{ stats?.by_potential?.tinggi || 0 }}</span>
+                <span class="text-xs text-emerald-600 dark:text-emerald-500">{{ getPercentage(stats?.by_potential?.tinggi) }}%</span>
+              </div>
+            </div>
+            <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-lg p-3">
+              <div class="flex items-center space-x-2 mb-1">
+                <span class="h-2.5 w-2.5 bg-amber-500 rounded-full"></span>
+                <span class="text-xs font-semibold text-amber-700 dark:text-amber-400">Sedang</span>
+              </div>
+              <div class="flex items-baseline justify-between">
+                <span class="text-xl font-extrabold text-amber-600 dark:text-amber-400">{{ stats?.by_potential?.sedang || 0 }}</span>
+                <span class="text-xs text-amber-600 dark:text-amber-500">{{ getPercentage(stats?.by_potential?.sedang) }}%</span>
+              </div>
+            </div>
+            <div class="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/40 rounded-lg p-3">
+              <div class="flex items-center space-x-2 mb-1">
+                <span class="h-2.5 w-2.5 bg-rose-500 rounded-full"></span>
+                <span class="text-xs font-semibold text-rose-700 dark:text-rose-400">Rendah</span>
+              </div>
+              <div class="flex items-baseline justify-between">
+                <span class="text-xl font-extrabold text-rose-600 dark:text-rose-400">{{ stats?.by_potential?.rendah || 0 }}</span>
+                <span class="text-xs text-rose-600 dark:text-rose-500">{{ getPercentage(stats?.by_potential?.rendah) }}%</span>
+              </div>
             </div>
           </div>
-          <span class="text-3xl font-extrabold text-slate-900 dark:text-white">{{ analysis.summary.total_umkm }}</span>
-        </div>
 
-        <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 p-5 rounded-2xl shadow-xl">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-sm font-bold text-slate-400 dark:text-[#6F767E] uppercase tracking-wider">Kategori</span>
-            <div class="h-8 w-8 rounded-lg bg-indigo-500/15 flex items-center justify-center">
-              <PieChart class="h-4 w-4 text-indigo-500" />
+          <!-- Progress Bars -->
+          <div class="space-y-2">
+            <div class="flex items-center space-x-3">
+              <span class="text-xs font-medium text-slate-600 dark:text-[#F0F0F0] w-16">Tinggi</span>
+              <div class="flex-1 bg-slate-100 dark:bg-[#111315] h-3 rounded-full overflow-hidden">
+                <div class="bg-emerald-500 h-full rounded-full transition-all duration-700" :style="{ width: getPercentage(stats?.by_potential?.tinggi) + '%' }"></div>
+              </div>
+              <span class="text-xs font-bold text-slate-700 dark:text-white w-20 text-right">{{ stats?.by_potential?.tinggi || 0 }} ({{ getPercentage(stats?.by_potential?.tinggi) }}%)</span>
+            </div>
+            <div class="flex items-center space-x-3">
+              <span class="text-xs font-medium text-slate-600 dark:text-[#F0F0F0] w-16">Sedang</span>
+              <div class="flex-1 bg-slate-100 dark:bg-[#111315] h-3 rounded-full overflow-hidden">
+                <div class="bg-amber-500 h-full rounded-full transition-all duration-700" :style="{ width: getPercentage(stats?.by_potential?.sedang) + '%' }"></div>
+              </div>
+              <span class="text-xs font-bold text-slate-700 dark:text-white w-20 text-right">{{ stats?.by_potential?.sedang || 0 }} ({{ getPercentage(stats?.by_potential?.sedang) }}%)</span>
+            </div>
+            <div class="flex items-center space-x-3">
+              <span class="text-xs font-medium text-slate-600 dark:text-[#F0F0F0] w-16">Rendah</span>
+              <div class="flex-1 bg-slate-100 dark:bg-[#111315] h-3 rounded-full overflow-hidden">
+                <div class="bg-rose-500 h-full rounded-full transition-all duration-700" :style="{ width: getPercentage(stats?.by_potential?.rendah) + '%' }"></div>
+              </div>
+              <span class="text-xs font-bold text-slate-700 dark:text-white w-20 text-right">{{ stats?.by_potential?.rendah || 0 }} ({{ getPercentage(stats?.by_potential?.rendah) }}%)</span>
             </div>
           </div>
-          <span class="text-3xl font-extrabold text-slate-900 dark:text-white">{{ analysis.summary.total_categories }}</span>
         </div>
 
-        <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 p-5 rounded-2xl shadow-xl">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-sm font-bold text-slate-400 dark:text-[#6F767E] uppercase tracking-wider">Kelurahan</span>
-            <div class="h-8 w-8 rounded-lg bg-emerald-500/15 flex items-center justify-center">
-              <MapPin class="h-4 w-4 text-emerald-500" />
-            </div>
-          </div>
-          <span class="text-3xl font-extrabold text-slate-900 dark:text-white">{{ analysis.summary.total_villages }}</span>
-        </div>
-
-        <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 p-5 rounded-2xl shadow-xl">
-          <div class="flex items-center justify-between mb-3">
-            <span class="text-sm font-bold text-slate-400 dark:text-[#6F767E] uppercase tracking-wider">Rata-rata Skor</span>
-            <div class="h-8 w-8 rounded-lg bg-rose-500/15 flex items-center justify-center">
-              <TrendingUp class="h-4 w-4 text-rose-500" />
-            </div>
-          </div>
-          <span class="text-3xl font-extrabold text-slate-900 dark:text-white">{{ analysis.summary.avg_potential_score }}</span>
-          <span class="text-sm text-slate-400 dark:text-[#6F767E] ml-1">/ 100</span>
-        </div>
-      </div>
-
-      <!-- Row: Village Analysis + Score Distribution -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pointer-events-auto">
-
-        <!-- Village Analysis -->
-        <div class="lg:col-span-2 bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 p-5 rounded-2xl shadow-xl">
-          <div class="flex items-center justify-between border-b border-slate-100 dark:border-[#2A2E33] pb-4 mb-5">
-            <h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center space-x-2">
-              <MapPin class="h-5 w-5 text-[#F59E0B]" />
+        <!-- Analisis per Kelurahan -->
+        <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center space-x-2">
+              <MapPin class="h-5 w-5 text-amber-500" />
               <span>Analisis per Kelurahan</span>
             </h3>
-            <span class="text-xs text-slate-400 dark:text-[#6F767E] font-medium">{{ analysis.summary.total_villages }} kelurahan</span>
+            <RouterLink to="/dashboard/by-village" class="text-xs text-amber-500 hover:text-amber-600 font-medium flex items-center space-x-1">
+              <span>Lihat Detail</span>
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </RouterLink>
           </div>
 
-          <div class="space-y-4">
-            <div v-for="(item, idx) in sortedVillages" :key="item.id" class="group">
-              <div class="flex justify-between items-center mb-1.5">
+          <div class="space-y-3">
+            <div v-for="(item, idx) in sortedVillages.slice(0, 8)" :key="item.id" class="group">
+              <div class="flex justify-between items-center mb-1">
                 <div class="flex items-center space-x-2">
                   <span class="w-5 text-xs font-bold text-slate-400 dark:text-[#6F767E] text-right">{{ idx + 1 }}</span>
-                  <span class="text-base font-semibold text-slate-700 dark:text-[#F0F0F0]">{{ item.name }}</span>
-                  <span v-if="hasMaxUmkm(item.umkm_count)" class="text-xs font-bold px-1.5 py-0.5 rounded bg-[#F59E0B]/20 text-[#F59E0B]">TERBANYAK</span>
+                  <span class="text-sm font-medium text-slate-700 dark:text-[#F0F0F0]">{{ item.name }}</span>
+                  <span v-if="hasMaxUmkm(item.umkm_count)" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">TERBANYAK</span>
                 </div>
-                <span class="text-sm font-bold text-slate-900 dark:text-white">{{ item.umkm_count }} <span class="text-xs font-normal text-slate-400 dark:text-[#6F767E]">UMKM</span></span>
+                <span class="text-sm font-bold text-slate-800 dark:text-white">{{ item.umkm_count }}</span>
               </div>
-              <div class="flex items-center space-x-3">
-                <div class="flex-1 bg-slate-100 dark:bg-[#111315] h-2.5 rounded-full overflow-hidden">
-                  <div
-                    class="h-full rounded-full transition-all duration-700"
-                    :class="getVillageBarColor(item.umkm_count)"
-                    :style="{ width: getVillagePercent(item.umkm_count) + '%' }"
-                  ></div>
+              <div class="flex items-center space-x-2">
+                <div class="flex-1 bg-slate-100 dark:bg-[#111315] h-2 rounded-full overflow-hidden">
+                  <div class="h-full rounded-full transition-all duration-700" :class="getVillageBarColor(item.umkm_count)" :style="{ width: getVillagePercent(item.umkm_count) + '%' }"></div>
                 </div>
-                <span class="text-xs font-semibold text-slate-500 dark:text-[#6F767E] w-10 text-right">{{ getVillagePercent(item.umkm_count) }}%</span>
+                <span class="text-xs font-medium text-slate-500 dark:text-[#6F767E] w-12 text-right">{{ getVillagePercent(item.umkm_count) }}%</span>
               </div>
             </div>
           </div>
         </div>
 
-        <!-- Score Distribution -->
-        <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 p-5 rounded-2xl shadow-xl flex flex-col">
-          <div class="flex items-center justify-between border-b border-slate-100 dark:border-[#2A2E33] pb-4 mb-5">
-            <h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center space-x-2">
-              <BarChart3 class="h-5 w-5 text-[#F59E0B]" />
-              <span>Sebaran Skor Potensi</span>
-            </h3>
-            <span class="text-xs text-slate-400 dark:text-[#6F767E] font-medium">{{ analysis.summary.scored_umkm }} UMKM</span>
-          </div>
-
-          <div class="flex-1 flex flex-col justify-center space-y-5">
-            <div v-for="bucket in analysis.score_distribution" :key="bucket.range" class="space-y-1.5">
-              <div class="flex justify-between text-xs">
-                <span class="font-medium text-slate-600 dark:text-[#F0F0F0]">{{ bucket.range }}</span>
-                <span class="font-bold text-slate-800 dark:text-white">{{ bucket.count }} <span class="font-normal text-slate-400 dark:text-[#6F767E]">UMKM</span></span>
-              </div>
-              <div class="w-full bg-slate-100 dark:bg-[#111315] h-3 rounded-full overflow-hidden">
-                <div
-                  class="h-full rounded-full transition-all duration-700"
-                  :class="getScoreColor(bucket.range)"
-                  :style="{ width: getScorePercent(bucket.count) + '%' }"
-                ></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="mt-5 pt-4 border-t border-slate-100 dark:border-[#2A2E33]">
-            <div class="flex items-center justify-between text-sm">
-              <span class="font-medium text-slate-500 dark:text-[#6F767E]">Rata-rata Skor</span>
-              <span class="text-xl font-extrabold text-slate-900 dark:text-white">{{ analysis.summary.avg_potential_score }}</span>
-            </div>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Row: Category Distribution + Category vs Potential -->
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 pointer-events-auto">
-
-        <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 p-5 rounded-2xl shadow-xl">
-          <div class="flex items-center justify-between border-b border-slate-100 dark:border-[#2A2E33] pb-4 mb-5">
-            <h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center space-x-2">
-              <PieChart class="h-5 w-5 text-[#F59E0B]" />
-              <span>Distribusi Kategori</span>
-            </h3>
-          </div>
-
-          <div class="space-y-4">
-            <div v-for="item in sortedCategories" :key="item.category" class="space-y-1">
-              <div class="flex justify-between text-xs">
-                <span class="font-medium text-slate-700 dark:text-[#F0F0F0] truncate max-w-[200px]">{{ item.category }}</span>
-                <span class="font-bold text-slate-900 dark:text-white">{{ item.count }}</span>
-              </div>
-              <div class="w-full bg-slate-100 dark:bg-[#111315] h-2 rounded-full overflow-hidden">
-                <div class="bg-[#F59E0B] h-full rounded-full transition-all duration-700" :style="{ width: getCatPercent(item.count) + '%' }"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 p-5 rounded-2xl shadow-xl lg:col-span-2">
-          <div class="flex items-center justify-between border-b border-slate-100 dark:border-[#2A2E33] pb-4 mb-5">
-            <h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center space-x-2">
-              <BarChart3 class="h-5 w-5 text-[#F59E0B]" />
+        <!-- Kategori vs Potensi Table -->
+        <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-xl p-4">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center space-x-2">
+              <BarChart3 class="h-5 w-5 text-amber-500" />
               <span>Kategori vs Potensi</span>
             </h3>
+            <RouterLink to="/dashboard/by-category" class="text-xs text-amber-500 hover:text-amber-600 font-medium flex items-center space-x-1">
+              <span>Lihat Detail</span>
+              <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+              </svg>
+            </RouterLink>
           </div>
 
           <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse text-sm">
+            <table class="w-full text-xs">
               <thead>
-                <tr class="border-b border-slate-200 dark:border-[#2A2E33] text-slate-400 dark:text-[#6F767E] text-sm font-bold uppercase tracking-wider">
-                  <th class="pb-3 pr-4">Kategori</th>
-                  <th class="pb-3 pr-4 text-right">Total</th>
-                  <th class="pb-3 pr-4 text-right">Rata-rata Skor</th>
-                  <th class="pb-3 pr-4 text-right text-emerald-600">Tinggi</th>
-                  <th class="pb-3 pr-4 text-right text-amber-600">Sedang</th>
-                  <th class="pb-3 text-right text-rose-600">Rendah</th>
+                <tr class="text-slate-400 dark:text-[#6F767E] font-bold uppercase tracking-wider border-b border-slate-100 dark:border-[#2A2E33]">
+                  <th class="pb-2 pr-4 text-left">Kategori</th>
+                  <th class="pb-2 pr-4 text-right">Total</th>
+                  <th class="pb-2 pr-4 text-right">Rata Skor</th>
+                  <th class="pb-2 pr-4 text-right text-emerald-600">Tinggi</th>
+                  <th class="pb-2 pr-4 text-right text-amber-600">Sedang</th>
+                  <th class="pb-2 text-right text-rose-600">Rendah</th>
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="item in categoryPotential"
-                  :key="item.category"
-                  class="border-b border-slate-100 dark:border-[#2A2E33] hover:bg-slate-50 dark:hover:bg-[#22262A] transition-colors"
-                >
-                  <td class="py-3 pr-4 font-medium text-slate-800 dark:text-white">{{ item.category }}</td>
-                  <td class="py-3 pr-4 text-right font-bold text-slate-900 dark:text-white">{{ item.total }}</td>
-                  <td class="py-3 pr-4 text-right">
-                    <span class="font-bold" :class="getScoreTextClass(item.avg_score)">{{ item.avg_score }}</span>
-                  </td>
-                  <td class="py-3 pr-4 text-right font-semibold text-emerald-600 dark:text-emerald-400">{{ item.tinggi }}</td>
-                  <td class="py-3 pr-4 text-right font-semibold text-amber-600 dark:text-amber-400">{{ item.sedang }}</td>
-                  <td class="py-3 text-right font-semibold text-rose-600 dark:text-rose-400">{{ item.rendah }}</td>
+                <tr v-for="item in categoryPotential" :key="item.category" class="border-b border-slate-50 dark:border-[#2A2E33]/50 hover:bg-slate-50 dark:hover:bg-[#22262A]/50 transition-colors">
+                  <td class="py-2.5 pr-4 font-medium text-slate-700 dark:text-[#F0F0F0]">{{ item.category }}</td>
+                  <td class="py-2.5 pr-4 text-right font-bold text-slate-800 dark:text-white">{{ item.total }}</td>
+                  <td class="py-2.5 pr-4 text-right font-bold" :class="getScoreTextClass(item.avg_score)">{{ item.avg_score }}</td>
+                  <td class="py-2.5 pr-4 text-right font-semibold text-emerald-600 dark:text-emerald-400">{{ item.tinggi }}</td>
+                  <td class="py-2.5 pr-4 text-right font-semibold text-amber-600 dark:text-amber-400">{{ item.sedang }}</td>
+                  <td class="py-2.5 text-right font-semibold text-rose-600 dark:text-rose-400">{{ item.rendah }}</td>
                 </tr>
               </tbody>
             </table>
           </div>
         </div>
-
       </div>
 
-      <!-- Top 5 UMKM -->
-      <div class="grid grid-cols-1 gap-6 pointer-events-auto">
-        <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 p-5 rounded-2xl shadow-xl">
-          <div class="flex items-center justify-between border-b border-slate-100 dark:border-[#2A2E33] pb-4 mb-5">
-            <h3 class="text-xl font-bold text-slate-800 dark:text-white flex items-center space-x-2">
-              <TrendingUp class="h-5 w-5 text-[#F59E0B]" />
-              <span>Top 5 UMKM Potensi Tertinggi</span>
-            </h3>
-          </div>
+      <!-- Right Column: 1/3 width -->
+      <div class="space-y-4">
 
-          <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-            <div
-              v-for="(umkm, idx) in analysis.top_umkm"
-              :key="umkm.id"
-              class="relative bg-slate-50 dark:bg-[#111315] border border-slate-100 dark:border-[#2A2E33] rounded-xl p-4 hover:shadow-lg transition-shadow"
-            >
-              <div
-                class="absolute -top-2 -left-2 h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold text-white"
-                :class="idx === 0 ? 'bg-[#F59E0B]' : idx === 1 ? 'bg-slate-400' : idx === 2 ? 'bg-amber-700' : 'bg-slate-500'"
-              >
-                {{ idx + 1 }}
+        <!-- Chart Section -->
+        <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-xl p-4">
+          <h3 class="text-base font-bold text-slate-800 dark:text-white flex items-center space-x-2 mb-3">
+            <Activity class="h-4 w-4 text-amber-500" />
+            <span>Registrasi per Bulan</span>
+          </h3>
+          <div class="h-40">
+            <Line
+              v-if="monthlyRegistrations.length"
+              :data="chartData"
+              :options="chartOptions"
+              :key="isDark ? 'dark' : 'light'"
+            />
+          </div>
+        </div>
+
+        <!-- Sebaran Skor -->
+        <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-xl p-4">
+          <h3 class="text-base font-bold text-slate-800 dark:text-white flex items-center space-x-2 mb-3">
+            <BarChart3 class="h-4 w-4 text-amber-500" />
+            <span>Sebaran Skor Potensi</span>
+          </h3>
+          <div class="space-y-3">
+            <div v-for="bucket in analysis.score_distribution" :key="bucket.range" class="space-y-1">
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-medium text-slate-600 dark:text-[#F0F0F0]">{{ bucket.range }}</span>
+                <span class="text-xs font-bold text-slate-700 dark:text-white">{{ bucket.count }} <span class="font-normal text-slate-400 dark:text-[#6F767E]">UMKM</span></span>
               </div>
-              <div class="mt-1">
-                <h4 class="font-bold text-base text-slate-800 dark:text-white truncate">{{ umkm.name }}</h4>
-                <p class="text-sm text-slate-500 dark:text-[#6F767E] mt-0.5 truncate">{{ umkm.owner }}</p>
-                <div class="mt-3 flex items-center justify-between">
-                  <span class="text-xs font-medium px-2 py-0.5 rounded-full bg-slate-100 dark:bg-[#22262A] text-slate-600 dark:text-[#F0F0F0] truncate max-w-[100px]">{{ umkm.category }}</span>
-                  <span class="text-sm font-extrabold" :class="getLevelColor(umkm.potential_level)">{{ umkm.potential_score }}</span>
+              <div class="w-full bg-slate-100 dark:bg-[#111315] h-2 rounded-full overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-700" :class="getScoreColor(bucket.range)" :style="{ width: getScorePercent(bucket.count) + '%' }"></div>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 dark:border-[#2A2E33] flex justify-between items-center">
+            <span class="text-xs font-medium text-slate-500 dark:text-[#6F767E]">Rata-rata</span>
+            <span class="text-lg font-extrabold text-amber-500">{{ analysis.summary.avg_potential_score }}</span>
+          </div>
+        </div>
+
+        <!-- Distribusi Kategori -->
+        <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-xl p-4">
+          <h3 class="text-base font-bold text-slate-800 dark:text-white flex items-center space-x-2 mb-3">
+            <PieChart class="h-4 w-4 text-amber-500" />
+            <span>Distribusi Kategori</span>
+          </h3>
+          <div class="space-y-2">
+            <div v-for="item in sortedCategories.slice(0, 6)" :key="item.category" class="flex items-center justify-between">
+              <span class="text-xs font-medium text-slate-600 dark:text-[#F0F0F0] truncate max-w-[120px]">{{ item.category }}</span>
+              <div class="flex items-center space-x-2">
+                <div class="w-20 bg-slate-100 dark:bg-[#111315] h-1.5 rounded-full overflow-hidden">
+                  <div class="bg-amber-500 h-full rounded-full" :style="{ width: getCatPercent(item.count) + '%' }"></div>
                 </div>
-                <p class="text-xs text-slate-400 dark:text-[#6F767E] mt-1.5 truncate">{{ umkm.village_name }}</p>
+                <span class="text-xs font-bold text-slate-700 dark:text-white w-6 text-right">{{ item.count }}</span>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
+        <!-- Top 5 UMKM -->
+        <div class="bg-amber-500 rounded-xl p-4 text-white shadow-lg">
+          <h3 class="text-base font-bold flex items-center space-x-2 mb-3">
+            <TrendingUp class="h-4 w-4" />
+            <span>Top 5 Potensi Tertinggi</span>
+          </h3>
+          <div class="space-y-3">
+            <div v-for="(umkm, idx) in analysis.top_umkm" :key="umkm.id" class="flex items-start space-x-3">
+              <div class="h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold" :class="idx === 0 ? 'bg-white/30' : 'bg-white/20'">
+                {{ idx + 1 }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold truncate">{{ umkm.name }}</p>
+                <p class="text-[10px] opacity-70 truncate">{{ umkm.category }} • {{ umkm.village_name }}</p>
+              </div>
+              <span class="text-lg font-extrabold" :class="idx === 0 ? 'text-white' : 'text-white/80'">{{ umkm.potential_score }}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
 
-    <!-- Loading Skeleton for Analysis -->
-    <div v-else class="space-y-6">
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 pointer-events-auto">
-        <div v-for="i in 4" :key="i" class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 p-5 rounded-2xl shadow-xl">
-          <div class="h-4 w-20 bg-slate-100 dark:bg-[#22262A] rounded animate-pulse mb-4"></div>
-          <div class="h-8 w-16 bg-slate-100 dark:bg-[#22262A] rounded animate-pulse"></div>
+    <!-- Loading State -->
+    <div v-if="loading" class="space-y-4">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div v-for="i in 4" :key="i" class="h-24 bg-slate-100 dark:bg-[#22262A] rounded-xl animate-pulse"></div>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div class="lg:col-span-2 h-64 bg-slate-100 dark:bg-[#22262A] rounded-xl animate-pulse"></div>
+        <div class="space-y-4">
+          <div class="h-40 bg-slate-100 dark:bg-[#22262A] rounded-xl animate-pulse"></div>
+          <div class="h-40 bg-slate-100 dark:bg-[#22262A] rounded-xl animate-pulse"></div>
         </div>
       </div>
     </div>
@@ -405,8 +309,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import { RouterLink } from 'vue-router';
-import { Store, TrendingUp, Activity, SlidersHorizontal, CalendarDays, MapPin, BarChart3, PieChart } from 'lucide-vue-next';
+import { Store, TrendingUp, Activity, MapPin, BarChart3, PieChart } from 'lucide-vue-next';
 import { Line } from 'vue-chartjs';
 import {
   Chart as ChartJS,
@@ -505,12 +408,6 @@ const analysis = ref<AnalysisData>({
   top_umkm: [],
   category_potential: [],
 });
-const loadingAnalysis = ref(true);
-
-// Mini bar chart data
-const barHeights = ref<number[]>([]);
-const barLabels = ['Jan', 'Mar', 'Mei', 'Jul', 'Sep', 'Nov'];
-const activeBarIndex = ref(0);
 
 const monthlyRegistrations = ref<number[]>([]);
 
@@ -523,13 +420,13 @@ const chartData = computed(() => ({
       if (!ctx.chart.chartArea) return 'transparent';
       const { ctx: c, chartArea: { top, bottom } } = ctx.chart;
       const grad = c.createLinearGradient(0, top, 0, bottom);
-      grad.addColorStop(0, 'rgba(245, 158, 11, 0.25)');
+      grad.addColorStop(0, 'rgba(245, 158, 11, 0.3)');
       grad.addColorStop(1, 'rgba(245, 158, 11, 0)');
       return grad;
     },
     fill: true,
     tension: 0.4,
-    pointRadius: 0,
+    pointRadius: 2,
     pointHitRadius: 6,
     borderWidth: 2,
   }]
@@ -538,19 +435,41 @@ const chartData = computed(() => ({
 const chartOptions = computed(() => ({
   responsive: true,
   maintainAspectRatio: false,
-  plugins: { tooltip: { enabled: false }, legend: { display: false } },
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      enabled: true,
+      backgroundColor: isDark.value ? '#1A1D1F' : '#ffffff',
+      titleColor: isDark.value ? '#F0F0F0' : '#1e293b',
+      bodyColor: isDark.value ? '#F0F0F0' : '#1e293b',
+      borderColor: isDark.value ? '#2A2E33' : '#e2e8f0',
+      borderWidth: 1,
+      padding: 8,
+      displayColors: false,
+    },
+  },
   scales: {
     x: {
-      display: false,
+      display: true,
       grid: { display: false },
+      ticks: {
+        color: isDark.value ? '#6F767E' : '#94a3b8',
+        font: { size: 9 },
+        maxRotation: 0,
+      },
     },
     y: {
-      display: false,
-      grid: { display: false },
+      display: true,
+      grid: { color: isDark.value ? 'rgba(111, 118, 126, 0.15)' : 'rgba(148, 163, 184, 0.15)' },
+      ticks: {
+        color: isDark.value ? '#6F767E' : '#94a3b8',
+        font: { size: 9 },
+        stepSize: 1,
+      },
       beginAtZero: true,
     },
   },
-  elements: { point: { radius: 0 } },
+  elements: { point: { radius: 2, hoverRadius: 4 } },
 }));
 
 const todayLabel = computed(() => {
@@ -558,7 +477,6 @@ const todayLabel = computed(() => {
   return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
 });
 
-// Computed
 const sortedVillages = computed(() =>
   [...analysis.value.village_analysis].sort((a, b) => b.umkm_count - a.umkm_count)
 );
@@ -596,8 +514,7 @@ function getVillageBarColor(count: number): string {
   if (maxVillageCount.value === 0) return 'bg-slate-300';
   const ratio = count / maxVillageCount.value;
   if (ratio >= 0.8) return 'bg-emerald-500';
-  if (ratio >= 0.5) return 'bg-[#F59E0B]';
-  if (ratio >= 0.3) return 'bg-amber-400';
+  if (ratio >= 0.5) return 'bg-amber-500';
   return 'bg-slate-300 dark:bg-slate-600';
 }
 
@@ -609,19 +526,13 @@ function getScorePercent(count: number): number {
 function getScoreColor(range: string): string {
   if (range.startsWith('0') || range.startsWith('21')) return 'bg-rose-500';
   if (range.startsWith('41')) return 'bg-amber-400';
-  if (range.startsWith('61')) return 'bg-[#F59E0B]';
+  if (range.startsWith('61')) return 'bg-amber-500';
   return 'bg-emerald-500';
 }
 
 function getCatPercent(count: number): number {
   if (totalCatCount.value === 0) return 0;
   return Math.round((count / totalCatCount.value) * 100);
-}
-
-function getLevelColor(level: string | null): string {
-  if (level === 'tinggi') return 'text-emerald-600 dark:text-emerald-400';
-  if (level === 'sedang') return 'text-amber-600 dark:text-amber-400';
-  return 'text-rose-600 dark:text-rose-400';
 }
 
 function getScoreTextClass(score: number): string {
@@ -653,12 +564,6 @@ async function fetchStats() {
         monthlyCounts[monthIdx] = item.count;
       });
       monthlyRegistrations.value = monthlyCounts;
-      const maxCount = Math.max(...monthlyCounts, 1);
-      barHeights.value = monthlyCounts.map(count => count > 0 ? Math.max((count / maxCount) * 100, 10) : 5);
-      activeBarIndex.value = new Date().getMonth();
-    } else {
-      barHeights.value = new Array(12).fill(5);
-      activeBarIndex.value = new Date().getMonth();
     }
   } catch (err: any) {
     console.error('Error fetching dashboard stats:', err);
@@ -668,14 +573,11 @@ async function fetchStats() {
 }
 
 async function fetchAnalysis() {
-  loadingAnalysis.value = true;
   try {
     const res = await api.get('/dashboard/analysis');
     analysis.value = res.data.data;
   } catch (err: any) {
     console.error('Error fetching analysis:', err);
-  } finally {
-    loadingAnalysis.value = false;
   }
 }
 

@@ -3,16 +3,16 @@
 
     <div class="bg-white dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200 dark:border-[#2A2E33]/60 p-6 rounded-2xl shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div>
-        <h1 class="text-xl font-bold text-slate-900 dark:text-white">Kelola Akun Petugas Lapangan</h1>
-        <p class="text-slate-500 dark:text-[#6F767E] text-sm mt-1">Administrator dapat menambah, mengedit, menghapus, atau mengatur ulang kata sandi akun petugas.</p>
+        <h1 class="text-xl font-bold text-slate-900 dark:text-white">Kelola Akun Administrator</h1>
+        <p class="text-slate-500 dark:text-[#6F767E] text-sm mt-1">Administrator dapat menambah, mengedit, atau mengatur ulang kata sandi akun.</p>
       </div>
       <div>
-        <button 
-          @click="openCreateModal" 
-          class="inline-flex items-center space-x-1.5 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+        <button
+          @click="openCreateModal"
+          class="inline-flex items-center space-x-1.5 px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-semibold transition-colors cursor-pointer"
         >
           <Plus class="h-3.5 w-3.5" />
-          <span>Tambah Akun Petugas</span>
+          <span>Tambah Admin</span>
         </button>
       </div>
     </div>
@@ -46,9 +46,9 @@
             <tr v-else-if="users.length === 0" class="text-center">
               <td colspan="6" class="p-8 text-slate-400 dark:text-[#6F767E]">Belum ada akun terdaftar.</td>
             </tr>
-            <tr 
-              v-else 
-              v-for="(u, idx) in users" 
+            <tr
+              v-else
+              v-for="(u, idx) in users"
               :key="u.id"
               class="hover:bg-slate-50/50 dark:hover:bg-[#22262A] transition-colors"
             >
@@ -56,33 +56,28 @@
               <td class="p-4 font-bold text-slate-800 dark:text-white">{{ u.name }}</td>
               <td class="p-4 text-slate-600 dark:text-[#F0F0F0] font-medium">{{ u.email }}</td>
               <td class="p-4">
-                <span 
-                  :class="[
-                    'px-2 py-0.5 rounded text-xs font-bold uppercase tracking-wider text-white inline-block',
-                    u.role === 'admin' ? 'bg-indigo-600' : 'bg-slate-500'
-                  ]"
-                >
-                  {{ u.role_label || u.role }}
+                <span class="px-2 py-0.5 bg-amber-500 text-white rounded text-xs font-bold uppercase tracking-wider">
+                  Admin
                 </span>
               </td>
               <td class="p-4 text-slate-500 dark:text-[#6F767E]">{{ formatDate(u.created_at) }}</td>
               <td class="p-4 text-right space-x-1.5">
-                <button 
-                  @click="openEditModal(u)" 
+                <button
+                  @click="openEditModal(u)"
                   class="inline-flex items-center justify-center p-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-lg hover:bg-slate-50 dark:hover:bg-[#22262A] text-slate-500 dark:text-[#6F767E] hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
                   title="Ubah Profil"
                 >
                   <Edit class="h-3.5 w-3.5" />
                 </button>
-                <button 
-                  @click="openResetModal(u)" 
+                <button
+                  @click="openResetModal(u)"
                   class="inline-flex items-center justify-center p-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-lg hover:bg-slate-50 dark:hover:bg-[#22262A] text-slate-500 dark:text-[#6F767E] hover:text-slate-800 dark:hover:text-white transition-colors cursor-pointer"
                   title="Reset Password"
                 >
                   <KeyRound class="h-3.5 w-3.5" />
                 </button>
-                <button 
-                  @click="confirmDelete(u)" 
+                <button
+                  @click="confirmDelete(u)"
                   :disabled="isCurrentUser(u)"
                   class="inline-flex items-center justify-center p-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-lg hover:bg-red-50 dark:hover:bg-red-500/10 text-slate-500 dark:text-[#6F767E] hover:text-red-600 dark:hover:text-red-400 transition-colors disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
                   title="Hapus Akun"
@@ -97,71 +92,59 @@
     </div>
 
     <!-- Create / Edit User Modal -->
-    <div 
-      v-if="modalOpen" 
+    <div
+      v-if="modalOpen"
       class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4"
     >
       <div class="bg-white dark:bg-[#1A1D1F] border border-slate-200 dark:border-[#2A2E33] rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-xl">
         <h3 class="font-bold text-slate-900 dark:text-white text-sm border-b border-slate-100 dark:border-[#2A2E33] pb-2">
-          {{ isEditMode ? 'Ubah Informasi Akun' : 'Tambah Petugas Baru' }}
+          {{ isEditMode ? 'Ubah Informasi Akun' : 'Tambah Administrator Baru' }}
         </h3>
 
         <form @submit.prevent="saveUser" class="space-y-4">
           <div>
             <label class="block text-xs font-bold text-slate-500 dark:text-[#6F767E] uppercase tracking-wider mb-1">Nama Lengkap</label>
-            <input 
-              v-model="modalForm.name" 
-              type="text" 
+            <input
+              v-model="modalForm.name"
+              type="text"
               required
-              class="block w-full px-3 py-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-white dark:bg-[#111315] text-slate-900 dark:text-white"
+              class="block w-full px-3 py-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white dark:bg-[#111315] text-slate-900 dark:text-white"
             />
           </div>
 
           <div v-if="!isEditMode">
             <label class="block text-xs font-bold text-slate-500 dark:text-[#6F767E] uppercase tracking-wider mb-1">Alamat Email</label>
-            <input 
-              v-model="modalForm.email" 
-              type="email" 
+            <input
+              v-model="modalForm.email"
+              type="email"
               required
-              placeholder="nama@gisumkm.test"
-              class="block w-full px-3 py-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-white dark:bg-[#111315] text-slate-900 dark:text-white"
+              placeholder="admin@gisumkm.test"
+              class="block w-full px-3 py-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white dark:bg-[#111315] text-slate-900 dark:text-white"
             />
           </div>
 
           <div v-if="!isEditMode">
             <label class="block text-xs font-bold text-slate-500 dark:text-[#6F767E] uppercase tracking-wider mb-1">Kata Sandi Awal</label>
-            <input 
-              v-model="modalForm.password" 
-              type="password" 
+            <input
+              v-model="modalForm.password"
+              type="password"
               required
               placeholder="Minimal 8 karakter"
-              class="block w-full px-3 py-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-white dark:bg-[#111315] text-slate-900 dark:text-white"
+              class="block w-full px-3 py-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white dark:bg-[#111315] text-slate-900 dark:text-white"
             />
           </div>
 
-          <div>
-            <label class="block text-xs font-bold text-slate-500 dark:text-[#6F767E] uppercase tracking-wider mb-1">Role / Hak Akses</label>
-            <select 
-              v-model="modalForm.role" 
-              required
-              class="block w-full px-3 py-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-white dark:bg-[#111315] text-slate-900 dark:text-white"
-            >
-              <option value="field_officer">Petugas Lapangan</option>
-              <option value="admin">Administrator</option>
-            </select>
-          </div>
-
           <div class="pt-4 border-t border-slate-100 dark:border-[#2A2E33] flex justify-end space-x-2">
-            <button 
-              type="button" 
-              @click="closeModal" 
+            <button
+              type="button"
+              @click="closeModal"
               class="px-3 py-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs font-semibold hover:bg-slate-50 dark:hover:bg-[#22262A] text-slate-600 dark:text-[#F0F0F0] bg-white dark:bg-[#1A1D1F] transition-colors cursor-pointer"
             >
               Batal
             </button>
-            <button 
-              type="submit" 
-              class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
+            <button
+              type="submit"
+              class="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
             >
               Simpan
             </button>
@@ -171,50 +154,50 @@
     </div>
 
     <!-- Reset Password Modal -->
-    <div 
-      v-if="resetModalOpen" 
+    <div
+      v-if="resetModalOpen"
       class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4"
     >
       <div class="bg-white dark:bg-[#1A1D1F] border border-slate-200 dark:border-[#2A2E33] rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-xl">
         <h3 class="font-bold text-slate-900 dark:text-white text-sm border-b border-slate-100 dark:border-[#2A2E33] pb-2">
-          Reset Kata Sandi Petugas
+          Reset Kata Sandi
         </h3>
         <p class="text-xs text-slate-500 dark:text-[#6F767E]">Anda akan mengganti kata sandi untuk akun <strong class="text-slate-800 dark:text-white">{{ activeUser?.name }}</strong>.</p>
 
         <form @submit.prevent="resetPassword" class="space-y-4">
           <div>
             <label class="block text-xs font-bold text-slate-500 dark:text-[#6F767E] uppercase tracking-wider mb-1">Kata Sandi Baru</label>
-            <input 
-              v-model="resetForm.password" 
-              type="password" 
+            <input
+              v-model="resetForm.password"
+              type="password"
               required
               placeholder="Minimal 8 karakter"
-              class="block w-full px-3 py-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-white dark:bg-[#111315] text-slate-900 dark:text-white"
+              class="block w-full px-3 py-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white dark:bg-[#111315] text-slate-900 dark:text-white"
             />
           </div>
 
           <div>
             <label class="block text-xs font-bold text-slate-500 dark:text-[#6F767E] uppercase tracking-wider mb-1">Konfirmasi Sandi Baru</label>
-            <input 
-              v-model="resetForm.password_confirmation" 
-              type="password" 
+            <input
+              v-model="resetForm.password_confirmation"
+              type="password"
               required
               placeholder="Ketik ulang sandi"
-              class="block w-full px-3 py-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-white dark:bg-[#111315] text-slate-900 dark:text-white"
+              class="block w-full px-3 py-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 bg-white dark:bg-[#111315] text-slate-900 dark:text-white"
             />
           </div>
 
           <div class="pt-4 border-t border-slate-100 dark:border-[#2A2E33] flex justify-end space-x-2">
-            <button 
-              type="button" 
-              @click="closeResetModal" 
+            <button
+              type="button"
+              @click="closeResetModal"
               class="px-3 py-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs font-semibold hover:bg-slate-50 dark:hover:bg-[#22262A] text-slate-600 dark:text-[#F0F0F0] bg-white dark:bg-[#1A1D1F] transition-colors cursor-pointer"
             >
               Batal
             </button>
-            <button 
-              type="submit" 
-              class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
+            <button
+              type="submit"
+              class="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-xs font-bold transition-colors cursor-pointer"
             >
               Ubah Sandi
             </button>
@@ -243,8 +226,7 @@ const activeUser = ref<any>(null);
 const modalForm = ref({
   name: '',
   email: '',
-  password: '',
-  role: 'field_officer'
+  password: ''
 });
 
 // Reset Password Modal
@@ -262,7 +244,7 @@ async function fetchUsers() {
     users.value = response.data.data || [];
   } catch (err: any) {
     console.error('Error fetching users:', err);
-    error.value = 'Gagal memuat daftar user. Harap pastikan hak akses Anda admin.';
+    error.value = 'Gagal memuat daftar user.';
   } finally {
     loading.value = false;
   }
@@ -284,8 +266,7 @@ function openCreateModal() {
   modalForm.value = {
     name: '',
     email: '',
-    password: '',
-    role: 'field_officer'
+    password: ''
   };
   modalOpen.value = true;
 }
@@ -296,8 +277,7 @@ function openEditModal(user: any) {
   modalForm.value = {
     name: user.name,
     email: user.email,
-    password: '',
-    role: user.role
+    password: ''
   };
   modalOpen.value = true;
 }
@@ -313,13 +293,12 @@ async function saveUser() {
   try {
     if (isEditMode.value && activeUser.value) {
       await api.put(`/users/${activeUser.value.id}`, {
-        name: modalForm.value.name,
-        role: modalForm.value.role
+        name: modalForm.value.name
       });
-      successMsg.value = 'Data user berhasil diperbarui.';
+      successMsg.value = 'Data admin berhasil diperbarui.';
     } else {
       await api.post('/users', modalForm.value);
-      successMsg.value = 'Akun petugas baru berhasil didaftarkan.';
+      successMsg.value = 'Akun admin baru berhasil didaftarkan.';
     }
     closeModal();
     fetchUsers();
@@ -362,18 +341,18 @@ async function resetPassword() {
     closeResetModal();
   } catch (err: any) {
     console.error('Error resetting password:', err);
-    error.value = 'Gagal mengganti kata sandi. Pastikan minimal 8 karakter.';
+    error.value = 'Gagal mengganti kata sandi.';
   }
 }
 
 // Delete user
 async function confirmDelete(user: any) {
-  if (confirm(`Apakah Anda yakin ingin menghapus petugas "${user.name}"? Tindakan ini tidak dapat dibatalkan.`)) {
+  if (confirm(`Apakah Anda yakin ingin menghapus "${user.name}"? Tindakan ini tidak dapat dibatalkan.`)) {
     error.value = '';
     successMsg.value = '';
     try {
       await api.delete(`/users/${user.id}`);
-      successMsg.value = 'Akun petugas berhasil dihapus.';
+      successMsg.value = 'Akun berhasil dihapus.';
       fetchUsers();
     } catch (err: any) {
       console.error('Error deleting user:', err);

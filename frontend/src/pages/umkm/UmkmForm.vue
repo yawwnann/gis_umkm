@@ -1,62 +1,62 @@
 <template>
-  <div class="space-y-6 font-sans">
-    <div class="bg-white border border-slate-200 p-6 rounded flex items-center justify-between">
+  <div class="space-y-6 font-sans text-slate-900 dark:text-white transition-colors">
+    <div class="bg-white/80 dark:bg-[#1A1D1F]/80 backdrop-blur-md border border-slate-200/50 dark:border-[#2A2E33]/50 p-6 rounded-3xl flex items-center justify-between shadow-sm">
       <div>
-        <h1 class="text-xl font-bold text-slate-900">{{ isEdit ? 'Ubah Data UMKM' : 'Tambah UMKM Baru' }}</h1>
-        <p class="text-slate-500 text-sm mt-1">Formulir untuk memasukkan data atribut dan koordinat lokasi spasial UMKM kuliner.</p>
+        <h1 class="text-xl font-bold text-slate-900 dark:text-white">{{ isEdit ? 'Ubah Data UMKM' : 'Tambah UMKM Baru' }}</h1>
+        <p class="text-slate-500 dark:text-[#6F767E] text-sm mt-1">Formulir untuk memasukkan data atribut dan koordinat lokasi spasial UMKM kuliner.</p>
       </div>
       <button 
         @click="$router.push('/umkm')" 
-        class="px-4 py-2 border border-slate-200 rounded text-xs font-semibold hover:bg-slate-50 text-slate-700 bg-white transition-colors cursor-pointer"
+        class="px-4 py-2 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs font-semibold hover:bg-slate-50 dark:hover:bg-[#22262A] text-slate-700 dark:text-[#F0F0F0] bg-white dark:bg-[#111315] transition-colors cursor-pointer"
       >
         Kembali
       </button>
     </div>
 
     <!-- Validation / Connection Errors -->
-    <div v-if="error" class="p-4 bg-red-50 border-l-4 border-red-500 text-red-700 text-xs">
+    <div v-if="error" class="p-4 bg-red-50 dark:bg-red-500/10 border-l-4 border-red-500 text-red-700 dark:text-red-400 text-xs rounded-lg">
       {{ error }}
     </div>
 
     <form @submit.prevent="handleSubmit" class="grid grid-cols-1 lg:grid-cols-2 gap-8">
       <!-- Fields card -->
-      <div class="bg-white border border-slate-200 rounded p-6 space-y-5">
-        <h3 class="font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4">Informasi Atribut Usaha</h3>
+      <div class="bg-white/80 dark:bg-[#1A1D1F]/80 backdrop-blur-md border border-slate-200/50 dark:border-[#2A2E33]/50 rounded-3xl p-6 space-y-5 shadow-sm">
+        <h3 class="font-bold text-slate-800 dark:text-white border-b border-slate-100 dark:border-[#2A2E33] pb-3 mb-4">Informasi Atribut Usaha</h3>
         
         <!-- Nama Usaha -->
         <div>
-          <label for="name" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Nama Usaha</label>
+          <label for="name" class="block text-xs font-bold text-slate-500 dark:text-[#6F767E] uppercase tracking-wider mb-1">Nama Usaha</label>
           <input 
             id="name" 
             v-model="form.name" 
             type="text" 
             required 
             placeholder="Contoh: Warung Makan Barokah"
-            class="block w-full px-3.5 py-2 border border-slate-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+            class="block w-full px-3.5 py-2 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs bg-white dark:bg-[#111315] text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-[#6F767E] focus:outline-none focus:ring-1 focus:ring-[#F59E0B] focus:border-[#F59E0B]"
           />
         </div>
 
         <!-- Nama Pemilik -->
         <div>
-          <label for="owner" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Nama Pemilik</label>
+          <label for="owner" class="block text-xs font-bold text-slate-500 dark:text-[#6F767E] uppercase tracking-wider mb-1">Nama Pemilik</label>
           <input 
             id="owner" 
             v-model="form.owner" 
             type="text" 
             required 
             placeholder="Contoh: Budi Santoso"
-            class="block w-full px-3.5 py-2 border border-slate-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+            class="block w-full px-3.5 py-2 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs bg-white dark:bg-[#111315] text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-[#6F767E] focus:outline-none focus:ring-1 focus:ring-[#F59E0B] focus:border-[#F59E0B]"
           />
         </div>
 
         <!-- Kategori -->
         <div>
-          <label for="category" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Kategori Usaha</label>
+          <label for="category" class="block text-xs font-bold text-slate-500 dark:text-[#6F767E] uppercase tracking-wider mb-1">Kategori Usaha</label>
           <select 
             id="category" 
             v-model="form.category" 
             required
-            class="block w-full px-3 py-2 border border-slate-200 rounded text-xs bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            class="block w-full px-3 py-2 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs bg-white dark:bg-[#111315] text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#F59E0B]"
           >
             <option value="" disabled>Pilih Kategori</option>
             <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
@@ -65,12 +65,12 @@
 
         <!-- Kelurahan -->
         <div>
-          <label for="village_id" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Kelurahan / Desa</label>
+          <label for="village_id" class="block text-xs font-bold text-slate-500 dark:text-[#6F767E] uppercase tracking-wider mb-1">Kelurahan / Desa</label>
           <select 
             id="village_id" 
             v-model="form.village_id" 
             required
-            class="block w-full px-3 py-2 border border-slate-200 rounded text-xs bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+            class="block w-full px-3 py-2 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs bg-white dark:bg-[#111315] text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#F59E0B]"
           >
             <option value="" disabled>Pilih Kelurahan</option>
             <option v-for="v in villages" :key="v.id" :value="v.id">{{ v.name }}</option>
@@ -79,21 +79,21 @@
 
         <!-- Alamat -->
         <div>
-          <label for="address" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Alamat Lengkap</label>
+          <label for="address" class="block text-xs font-bold text-slate-500 dark:text-[#6F767E] uppercase tracking-wider mb-1">Alamat Lengkap</label>
           <textarea 
             id="address" 
             v-model="form.address" 
             rows="3" 
             required
             placeholder="Nama jalan, nomor, RT/RW..."
-            class="block w-full px-3.5 py-2 border border-slate-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+            class="block w-full px-3.5 py-2 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs bg-white dark:bg-[#111315] text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-[#6F767E] focus:outline-none focus:ring-1 focus:ring-[#F59E0B] focus:border-[#F59E0B]"
           ></textarea>
         </div>
 
         <!-- Coordinates inputs -->
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label for="latitude" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Latitude</label>
+            <label for="latitude" class="block text-xs font-bold text-slate-500 dark:text-[#6F767E] uppercase tracking-wider mb-1">Latitude</label>
             <input 
               id="latitude" 
               v-model.number="form.latitude" 
@@ -101,12 +101,12 @@
               step="any"
               required 
               placeholder="-1.8889"
-              class="block w-full px-3.5 py-2 border border-slate-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              class="block w-full px-3.5 py-2 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs bg-white dark:bg-[#111315] text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-[#6F767E] focus:outline-none focus:ring-1 focus:ring-[#F59E0B]"
               @input="updateMarkerFromInputs"
             />
           </div>
           <div>
-            <label for="longitude" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Longitude</label>
+            <label for="longitude" class="block text-xs font-bold text-slate-500 dark:text-[#6F767E] uppercase tracking-wider mb-1">Longitude</label>
             <input 
               id="longitude" 
               v-model.number="form.longitude" 
@@ -114,25 +114,25 @@
               step="any"
               required 
               placeholder="106.1038"
-              class="block w-full px-3.5 py-2 border border-slate-200 rounded text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500"
+              class="block w-full px-3.5 py-2 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs bg-white dark:bg-[#111315] text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-[#6F767E] focus:outline-none focus:ring-1 focus:ring-[#F59E0B]"
               @input="updateMarkerFromInputs"
             />
           </div>
         </div>
 
         <!-- Submit Buttons -->
-        <div class="pt-4 border-t border-slate-100 flex items-center justify-end space-x-3">
+        <div class="pt-4 border-t border-slate-100 dark:border-[#2A2E33] flex items-center justify-end space-x-3">
           <button 
             type="button" 
             @click="$router.push('/umkm')"
-            class="px-4 py-2 border border-slate-200 rounded text-xs font-semibold hover:bg-slate-50 text-slate-700 bg-white transition-colors cursor-pointer"
+            class="px-4 py-2 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs font-semibold hover:bg-slate-50 dark:hover:bg-[#22262A] text-slate-700 dark:text-[#F0F0F0] bg-white dark:bg-[#111315] transition-colors cursor-pointer"
           >
             Batal
           </button>
           <button 
             type="submit" 
             :disabled="submitting"
-            class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+            class="px-5 py-2.5 bg-[#F59E0B] hover:bg-[#D97706] text-[#111315] rounded-xl text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer shadow-lg shadow-[#F59E0B]/20"
           >
             {{ submitting ? 'Menyimpan...' : (isEdit ? 'Simpan Perubahan' : 'Tambah UMKM') }}
           </button>
@@ -140,14 +140,14 @@
       </div>
 
       <!-- Map Picker card -->
-      <div class="bg-white border border-slate-200 rounded p-6 flex flex-col min-h-[400px]">
-        <h3 class="font-bold text-slate-800 border-b border-slate-100 pb-3 mb-4 flex items-center space-x-1.5">
-          <Map class="h-4.5 w-4.5 text-indigo-500" />
+      <div class="bg-white/80 dark:bg-[#1A1D1F]/80 backdrop-blur-md border border-slate-200/50 dark:border-[#2A2E33]/50 rounded-3xl p-6 flex flex-col min-h-[400px] shadow-sm">
+        <h3 class="font-bold text-slate-800 dark:text-white border-b border-slate-100 dark:border-[#2A2E33] pb-3 mb-4 flex items-center space-x-1.5">
+          <Map class="h-4.5 w-4.5 text-[#F59E0B]" />
           <span>Pilih Koordinat pada Peta</span>
         </h3>
-        <p class="text-xs text-slate-500 mb-3">Klik di area peta mana saja untuk meletakkan pin koordinat secara presisi, atau seret pin yang ada.</p>
+        <p class="text-xs text-slate-500 dark:text-[#6F767E] mb-3">Klik di area peta mana saja untuk meletakkan pin koordinat secara presisi, atau seret pin yang ada.</p>
         
-        <div class="flex-1 border border-slate-200 rounded overflow-hidden relative">
+        <div class="flex-1 border border-slate-200 dark:border-[#2A2E33] rounded-2xl overflow-hidden relative bg-slate-100 dark:bg-[#111315]">
           <div id="form-map" class="w-full h-full min-h-[300px]"></div>
         </div>
       </div>
@@ -156,11 +156,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { Map } from 'lucide-vue-next';
 import L from 'leaflet';
 import api from '../../services/api';
+import { useTheme } from '../../composables/useTheme';
 
 const props = defineProps({
   id: {
@@ -171,6 +172,7 @@ const props = defineProps({
 
 const router = useRouter();
 const route = useRoute();
+const { isDark } = useTheme();
 
 const isEdit = ref(!!props.id);
 const submitting = ref(false);
@@ -193,6 +195,7 @@ const form = ref({
 // Map variables
 let formMap: L.Map | null = null;
 let pickerMarker: L.Marker | null = null;
+let formTileLayer: L.TileLayer | null = null;
 const defaultCenter: L.LatLngExpression = [-1.8889, 106.1038];
 
 onMounted(async () => {
@@ -204,6 +207,15 @@ onMounted(async () => {
   
   await nextTick();
   initFormMap();
+});
+
+watch(isDark, () => {
+  if (formMap && formTileLayer) {
+    const url = isDark.value 
+      ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
+      : 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png';
+    formTileLayer.setUrl(url);
+  }
 });
 
 async function fetchOptions() {
@@ -245,14 +257,17 @@ function initFormMap() {
     zoom: 14
   });
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; OpenStreetMap'
+  const tileUrl = isDark.value 
+    ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
+    : 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png';
+
+  formTileLayer = L.tileLayer(tileUrl, {
+    maxZoom: 20
   }).addTo(formMap);
 
   // Set up coordinate picking marker
   const pinIcon = L.divIcon({
-    html: '<div style="background-color: #4f46e5; width: 16px; height: 16px; border: 2.5px solid white; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3)"></div>',
+    html: '<div style="background-color: #f59e0b; width: 16px; height: 16px; border: 2.5px solid white; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3)"></div>',
     iconSize: [16, 16],
     iconAnchor: [8, 8]
   });

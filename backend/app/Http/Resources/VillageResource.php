@@ -15,10 +15,7 @@ class VillageResource extends JsonResource
             'population' => $this->population,
             'area_km2' => $this->area_km2 ? (float) $this->area_km2 : null,
             'density' => $this->density ? (float) $this->density : null,
-            'umkm_count' => $this->when(
-                isset($this->umkm_count),
-                fn() => (int) $this->umkm_count
-            ),
+            'umkm_count' => (int) ($this->umkms_count ?? $this->umkm_count ?? 0),
             'created_at' => $this->created_at?->toISOString(),
             'updated_at' => $this->updated_at?->toISOString(),
         ];

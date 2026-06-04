@@ -56,8 +56,8 @@
                 </span>
               </td>
               <td class="p-4 text-right">
-                <RouterLink 
-                  :to="'/villages/' + village.id" 
+                <RouterLink
+                  :to="`/admin/villages/` + village.id"
                   class="inline-flex items-center justify-center px-3 py-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-lg hover:bg-slate-50 dark:hover:bg-[#22262A] text-slate-600 dark:text-[#6F767E] hover:text-slate-800 dark:hover:text-white transition-colors"
                 >
                   <Eye class="h-3.5 w-3.5 mr-1" />

@@ -174,9 +174,30 @@ async function fetchVillageDetail() {
 async function initVillageMap() {
   if (!village.value) return;
 
+  // Wait for DOM to be ready
+  await nextTick();
+  const mapContainer = document.getElementById('village-map');
+  if (!mapContainer) {
+    console.error('Map container not found');
+    return;
+  }
+
+  // Center on Sungailiat coordinates
+  const centerLat = village.value.geom?.coordinates ?
+    (Array.isArray(village.value.geom.coordinates[0][0]) ?
+      village.value.geom.coordinates[0][0][1] :
+      village.value.geom.coordinates[1]) :
+    -1.8889;
+  const centerLng = village.value.geom?.coordinates ?
+    (Array.isArray(village.value.geom.coordinates[0][0]) ?
+      village.value.geom.coordinates[0][0][0] :
+      village.value.geom.coordinates[0]) :
+    106.1038;
+
   villageMap = L.map('village-map', {
-    center: [-1.8889, 106.1038],
-    zoom: 13
+    center: [centerLat, centerLng],
+    zoom: 14,
+    zoomControl: true
   });
 
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -188,34 +209,61 @@ async function initVillageMap() {
 
   try {
     const boundariesRes = await api.get('/map/villages');
-    const matchFeature = boundariesRes.data.features.find((f: any) => f.properties.id == props.id);
+    const features = boundariesRes.data.features || [];
+    const villageId = parseInt(props.id);
+    const matchFeature = features.find((f: any) => f.properties?.id === villageId);
 
     if (matchFeature) {
-      boundariesLayer = L.geoJSON(matchFeature, {
-        style: {
-          color: '#4f46e5',
-          weight: 3,
-          fillColor: '#4f46e5',
-          fillOpacity: 0.1
+      // Fix GeoJSON if coordinates are in wrong order
+      let geoJson = matchFeature;
+      if (matchFeature.geometry?.coordinates) {
+        // Check if it's actually a Point instead of Polygon
+        if (matchFeature.geometry.type === 'Point') {
+          console.warn('Village geometry is Point, not Polygon');
+          // Center map on point instead
+          villageMap.setView([matchFeature.geometry.coordinates[1], matchFeature.geometry.coordinates[0]], 15);
+        } else {
+          boundariesLayer = L.geoJSON(geoJson, {
+            style: {
+              color: '#4f46e5',
+              weight: 3,
+              fillColor: '#4f46e5',
+              fillOpacity: 0.15
+            }
+          }).addTo(villageMap);
+          villageMap.fitBounds(boundariesLayer.getBounds(), { padding: [30, 30] });
         }
-      }).addTo(villageMap);
-
-      villageMap.fitBounds(boundariesLayer.getBounds(), { padding: [20, 20] });
+      }
+    } else {
+      console.warn('Village boundary not found for ID:', villageId);
+      // Show message on map
+      L.popup()
+        .setLatLng([centerLat, centerLng])
+        .setContent('<div style="padding: 10px; text-align: center;">Batas wilayah tidak tersedia</div>')
+        .openOn(villageMap);
     }
 
+    // Add UMKM markers
     localUmkms.value.forEach(umkmItem => {
+      if (!umkmItem.latitude || !umkmItem.longitude) return;
+
       const coords: L.LatLngExpression = [Number(umkmItem.latitude), Number(umkmItem.longitude)];
-      const normLevel = String(umkmItem.potential_level).toLowerCase();
+      const normLevel = String(umkmItem.potential_level || '').toLowerCase();
       const color = normLevel === 'tinggi' ? '#10b981' : (normLevel === 'sedang' ? '#f59e0b' : '#ef4444');
 
       const customIcon = L.divIcon({
-        html: `<div style="background-color: ${color}; width: 12px; height: 12px; border: 2px solid white; border-radius: 50%; box-shadow: 0 1px 3px rgba(0,0,0,0.3)"></div>`,
+        html: `<div style="background-color: ${color}; width: 12px; height: 12px; border: 2px solid white; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.3)"></div>`,
         iconSize: [12, 12],
         iconAnchor: [6, 6]
       });
 
       const marker = L.marker(coords, { icon: customIcon });
-      marker.bindPopup(`<div class="p-2 text-xs font-bold text-slate-800 dark:text-white">${umkmItem.name}</div>`);
+      marker.bindPopup(`
+        <div style="min-width: 150px;">
+          <strong style="font-size: 12px;">${umkmItem.name}</strong><br>
+          <span style="font-size: 11px; color: #666;">${umkmItem.category}</span>
+        </div>
+      `);
       marker.addTo(umkmsLayer);
     });
 

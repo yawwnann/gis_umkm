@@ -10,7 +10,6 @@ import ByVillage from './pages/dashboard/ByVillage.vue';
 import ByCategory from './pages/dashboard/ByCategory.vue';
 import ByPotential from './pages/dashboard/ByPotential.vue';
 
-
 import UmkmList from './pages/umkm/UmkmList.vue';
 import UmkmForm from './pages/umkm/UmkmForm.vue';
 
@@ -37,8 +36,11 @@ const routes: Array<RouteRecordRaw> = [
       if (token && userStr) {
         try {
           const user = JSON.parse(userStr);
-          const urlRole = user.role === 'field_officer' ? 'officer' : user.role;
-          next({ name: 'dashboard', params: { role: urlRole } });
+          if (user.role === 'admin') {
+            next({ name: 'dashboard' });
+          } else {
+            next();
+          }
         } catch(e) {
           next();
         }
@@ -54,12 +56,16 @@ const routes: Array<RouteRecordRaw> = [
     props: true,
   },
 
-  // Protected Routes (Dashboard Wrapper)
+  // Protected Routes (Admin Only)
   {
-    path: '/:role(admin|officer|field_officer|petugas)',
+    path: '/admin',
     component: DashboardLayout,
     meta: { requiresAuth: true },
     children: [
+      {
+        path: '',
+        redirect: '/admin/dashboard'
+      },
       {
         path: 'dashboard',
         name: 'dashboard',
@@ -116,20 +122,11 @@ const routes: Array<RouteRecordRaw> = [
         component: VillageDetail,
         props: true,
       },
-      // User management (Admin only)
+      // User management
       {
         path: 'users',
         name: 'users.index',
         component: UserList,
-        beforeEnter: (to, from, next) => {
-          const userStr = localStorage.getItem('user_info');
-          const user = userStr ? JSON.parse(userStr) : null;
-          if (user && user.role === 'admin') {
-            next();
-          } else {
-            next({ name: 'dashboard', params: { role: user?.role || 'petugas' } });
-          }
-        }
       }
     ]
   },
@@ -158,12 +155,7 @@ router.beforeEach((to, from, next) => {
     if (!token || !user) {
       next({ name: 'login' });
     } else {
-      // Validasi konsistensi role di URL dengan role aslinya
-      if (to.params.role && to.params.role !== user.role) {
-        next(`/${user.role}/dashboard`);
-      } else {
-        next();
-      }
+      next();
     }
   } else {
     next();

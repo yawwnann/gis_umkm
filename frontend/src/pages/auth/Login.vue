@@ -103,20 +103,19 @@ const errorMessage = ref('');
 async function handleLogin() {
   loading.value = true;
   errorMessage.value = '';
-  
+
   try {
     const response = await api.post('/auth/login', {
       email: email.value,
       password: password.value,
     });
-    
+
     const { access_token, user } = response.data;
-    
+
     localStorage.setItem('auth_token', access_token);
     localStorage.setItem('user_info', JSON.stringify(user));
-    
-    const urlRole = user.role === 'field_officer' ? 'officer' : user.role;
-    router.push({ name: 'dashboard', params: { role: urlRole } });
+
+    router.push('/admin/dashboard');
   } catch (error: any) {
     console.error('Login error details:', error);
     if (error.response && error.response.data && error.response.data.message) {

@@ -1,0 +1,121 @@
+{
+  "kabupaten_kota": {
+    "kode": "19.01",
+    "nama": "BANGKA"
+  },
+  "kecamatan": {
+    "kode": "19.01.01",
+    "nama": "SUNGAILIAT"
+  },
+  "villages": [
+    {
+      "no": 1,
+      "kode_desa_kelurahan": "19.01.01.1001",
+      "nama_desa_kelurahan": "Sungailiat",
+      "laki_laki": 10897,
+      "perempuan": 10412,
+      "total": 21309
+    },
+    {
+      "no": 2,
+      "kode_desa_kelurahan": "19.01.01.1002",
+      "nama_desa_kelurahan": "Sri Menanti",
+      "laki_laki": 6558,
+      "perempuan": 6485,
+      "total": 13043
+    },
+    {
+      "no": 3,
+      "kode_desa_kelurahan": "19.01.01.1003",
+      "nama_desa_kelurahan": "Kudai",
+      "laki_laki": 3070,
+      "perempuan": 3103,
+      "total": 6173
+    },
+    {
+      "no": 4,
+      "kode_desa_kelurahan": "19.01.01.1004",
+      "nama_desa_kelurahan": "Sinar Baru",
+      "laki_laki": 1523,
+      "perempuan": 1464,
+      "total": 2987
+    },
+    {
+      "no": 5,
+      "kode_desa_kelurahan": "19.01.01.1005",
+      "nama_desa_kelurahan": "Kenanga",
+      "laki_laki": 3139,
+      "perempuan": 3012,
+      "total": 6151
+    },
+    {
+      "no": 6,
+      "kode_desa_kelurahan": "19.01.01.1006",
+      "nama_desa_kelurahan": "Parit Padang",
+      "laki_laki": 4936,
+      "perempuan": 4828,
+      "total": 9764
+    },
+    {
+      "no": 7,
+      "kode_desa_kelurahan": "19.01.01.1008",
+      "nama_desa_kelurahan": "Sinar Jaya Jelutung",
+      "laki_laki": 3802,
+      "perempuan": 3539,
+      "total": 7341
+    },
+    {
+      "no": 8,
+      "kode_desa_kelurahan": "19.01.01.1009",
+      "nama_desa_kelurahan": "Matras",
+      "laki_laki": 2153,
+      "perempuan": 2090,
+      "total": 4243
+    },
+    {
+      "no": 9,
+      "kode_desa_kelurahan": "19.01.01.1010",
+      "nama_desa_kelurahan": "Jelitik",
+      "laki_laki": 2843,
+      "perempuan": 2675,
+      "total": 5518
+    },
+    {
+      "no": 10,
+      "kode_desa_kelurahan": "19.01.01.1011",
+      "nama_desa_kelurahan": "Surya Timur",
+      "laki_laki": 1994,
+      "perempuan": 1906,
+      "total": 3900
+    },
+    {
+      "no": 11,
+      "kode_desa_kelurahan": "19.01.01.1012",
+      "nama_desa_kelurahan": "Lubuk Kelik",
+      "laki_laki": 1337,
+      "perempuan": 1323,
+      "total": 2660
+    },
+    {
+      "no": 12,
+      "kode_desa_kelurahan": "19.01.01.1013",
+      "nama_desa_kelurahan": "Bukit Betung",
+      "laki_laki": 4300,
+      "perempuan": 4473,
+      "total": 8773
+    },
+    {
+      "no": 13,
+      "kode_desa_kelurahan": "19.01.01.2007",
+      "nama_desa_kelurahan": "Rebo",
+      "laki_laki": 2792,
+      "perempuan": 2663,
+      "total": 5455
+    }
+  ],
+  "total_keseluruhan": {
+    "laki_laki": 49344,
+    "perempuan": 47973,
+    "total": 97317
+  }
+}

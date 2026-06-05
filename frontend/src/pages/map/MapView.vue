@@ -1120,24 +1120,23 @@ function setTileLayer(type: string) {
   basemap.value = type;
 
   if (type === "streets") {
-    // Stadia Maps based on theme
+    // OpenStreetMap tiles - free, no API key required
     const url = isDark.value
-      ? "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png"
-      : "https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png";
+      ? "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+      : "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
 
     tileLayer = L.tileLayer(url, {
-      maxZoom: 20,
-      attribution:
-        '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors',
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     });
   } else {
-    // Satellite
+    // Satellite - Esri World Imagery (free)
     tileLayer = L.tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
       {
-        attribution:
-          "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
-      },
+        maxZoom: 19,
+        attribution: "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
+      }
     );
   }
 

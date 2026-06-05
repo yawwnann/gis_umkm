@@ -246,11 +246,9 @@ onMounted(async () => {
 });
 
 // Watch theme changes to update map tiles
-watch(isDark, (dark) => {
+watch(isDark, () => {
   if (detailMap.value && tileLayer) {
-    const url = dark 
-      ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
-      : 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png';
+    const url = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
     tileLayer.setUrl(url);
   }
 });
@@ -314,12 +312,11 @@ function initDetailMap() {
   
   L.control.zoom({ position: 'topright' }).addTo(detailMap.value);
 
-  const tileUrl = isDark.value 
-    ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
-    : 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png';
+  const tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
   tileLayer = L.tileLayer(tileUrl, {
-    maxZoom: 20
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(detailMap.value);
 
   const normLevel = String(umkm.value.potential_level).toLowerCase();

@@ -211,9 +211,7 @@ onMounted(async () => {
 
 watch(isDark, () => {
   if (formMap && formTileLayer) {
-    const url = isDark.value 
-      ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
-      : 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png';
+    const url = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
     formTileLayer.setUrl(url);
   }
 });
@@ -257,12 +255,11 @@ function initFormMap() {
     zoom: 14
   });
 
-  const tileUrl = isDark.value 
-    ? 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
-    : 'https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png';
+  const tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 
   formTileLayer = L.tileLayer(tileUrl, {
-    maxZoom: 20
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
   }).addTo(formMap);
 
   // Set up coordinate picking marker

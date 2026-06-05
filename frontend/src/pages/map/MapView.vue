@@ -1120,14 +1120,17 @@ function setTileLayer(type: string) {
   basemap.value = type;
 
   if (type === "streets") {
-    // OpenStreetMap tiles - free, no API key required
+    // OSM / CartoDB tiles based on theme
     const url = isDark.value
-      ? "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-      : "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+      ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+      : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 
     tileLayer = L.tileLayer(url, {
       maxZoom: 19,
-      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      attribution: isDark.value
+        ? '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      subdomains: isDark.value ? 'abcd' : 'a',
     });
   } else {
     // Satellite - Esri World Imagery (free)

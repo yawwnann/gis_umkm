@@ -211,7 +211,9 @@ onMounted(async () => {
 
 watch(isDark, () => {
   if (formMap && formTileLayer) {
-    const url = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+    const url = isDark.value
+      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     formTileLayer.setUrl(url);
   }
 });
@@ -255,11 +257,17 @@ function initFormMap() {
     zoom: 14
   });
 
-  const tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+  // Dark mode support with CartoDB dark tiles
+  const tileUrl = isDark.value
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
   formTileLayer = L.tileLayer(tileUrl, {
     maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    attribution: isDark.value
+      ? '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    subdomains: isDark.value ? 'abcd' : 'a',
   }).addTo(formMap);
 
   // Set up coordinate picking marker

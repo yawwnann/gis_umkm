@@ -248,8 +248,13 @@ onMounted(async () => {
 // Watch theme changes to update map tiles
 watch(isDark, () => {
   if (detailMap.value && tileLayer) {
-    const url = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+    const url = isDark.value
+      ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+      : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
     tileLayer.setUrl(url);
+    if (isDark.value) {
+      tileLayer.setUrl(url);
+    }
   }
 });
 
@@ -312,11 +317,17 @@ function initDetailMap() {
   
   L.control.zoom({ position: 'topright' }).addTo(detailMap.value);
 
-  const tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+  // Dark mode support with CartoDB dark tiles
+  const tileUrl = isDark.value
+    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
   tileLayer = L.tileLayer(tileUrl, {
     maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    attribution: isDark.value
+      ? '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+      : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    subdomains: isDark.value ? 'abcd' : 'a',
   }).addTo(detailMap.value);
 
   const normLevel = String(umkm.value.potential_level).toLowerCase();

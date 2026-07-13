@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div
     class="h-screen w-screen relative overflow-hidden font-sans bg-slate-50 dark:bg-[#111315] text-slate-900 dark:text-[#F0F0F0] transition-colors duration-200"
   >
@@ -552,49 +552,7 @@
           </div>
         </div>
 
-        <!-- Routing Information Panel -->
-        <div
-          v-if="routingActive && routeInfo"
-          class="p-4 bg-[#F59E0B]/10 border border-[#F59E0B]/20 rounded-xl space-y-3"
-        >
-          <div
-            class="flex items-center justify-between border-b border-[#F59E0B]/20 pb-2"
-          >
-            <label
-              class="block text-[10px] font-bold text-slate-700 dark:text-[#F59E0B] uppercase tracking-widest flex items-center space-x-1.5"
-            >
-              <Navigation class="h-3.5 w-3.5" />
-              <span>Info Rute</span>
-            </label>
-            <button
-              @click="clearRoute"
-              class="text-slate-500 dark:text-[#6F767E] hover:text-slate-900 dark:hover:text-white p-1 rounded"
-            >
-              <X class="h-3.5 w-3.5" />
-            </button>
-          </div>
 
-          <div class="text-xs space-y-2">
-            <div class="flex justify-between items-center">
-              <span class="text-slate-600 dark:text-[#6F767E] font-medium"
-                >Jarak Tempuh:</span
-              >
-              <span
-                class="font-bold text-slate-900 dark:text-white bg-white dark:bg-[#22262A] px-2 py-1 rounded border border-slate-200 dark:border-transparent"
-                >{{ routeInfo.distance_km }} Km</span
-              >
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-slate-600 dark:text-[#6F767E] font-medium"
-                >Estimasi Waktu:</span
-              >
-              <span
-                class="font-bold text-slate-900 dark:text-white bg-white dark:bg-[#22262A] px-2 py-1 rounded border border-slate-200 dark:border-transparent"
-                >{{ routeInfo.duration_min }} Menit</span
-              >
-            </div>
-          </div>
-        </div>
       </div>
     </aside>
 
@@ -644,7 +602,7 @@ import {
   X,
   ChevronRight,
   ChevronLeft,
-  Navigation,
+
   LayoutDashboard,
   LogIn,
   LocateFixed,
@@ -668,6 +626,7 @@ import { useTheme } from "../../composables/useTheme";
 declare global {
   interface Window {
     L: any;
+    router: any;
   }
 }
 
@@ -688,7 +647,6 @@ window.addEventListener("resize", () => {
 // Use shallowRef for Leaflet objects to prevent massive performance drops during map animations!
 const map = shallowRef<L.Map | null>(null);
 const umkmLayer = shallowRef<L.LayerGroup | null>(null);
-const routeLayer = shallowRef<L.LayerGroup | null>(null);
 
 // Heatmap state
 const heatmapLayer = shallowRef<any>(null); // L.heatLayer
@@ -814,12 +772,7 @@ const mapStats = computed(() => {
   };
 });
 
-// Routing state
-const routingActive = ref(false);
-const userLocation = ref<L.LatLng | null>(null);
-const routeInfo = ref<{ distance_km: string; duration_min: string } | null>(
-  null,
-);
+
 
 // Icons setup
 const createUmkmIcon = (color: string) => {
@@ -849,13 +802,6 @@ const markerIcons = {
   rendah: createUmkmIcon("#f43f5e"),
   default: createUmkmIcon("#F59E0B"),
 };
-
-const userIcon = L.divIcon({
-  className: "custom-user-icon",
-  html: `<div style="background-color: #3b82f6; width: 16px; height: 16px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(59,130,246,0.8);"></div>`,
-  iconSize: [16, 16],
-  iconAnchor: [8, 8],
-});
 
 // Watch for authentication state changes
 window.addEventListener("storage", () => {
@@ -898,13 +844,12 @@ function initMap() {
     polygonsPane.style.zIndex = "390";
   }
 
-  umkmLayer.value = L.layerGroup().addTo(map.value);
-  routeLayer.value = L.layerGroup().addTo(map.value);
-
-  // Clear route when popup is closed
-  map.value.on("popupclose", () => {
-    clearRoute();
-  });
+  umkmLayer.value = (L as any).markerClusterGroup({
+    spiderfyOnMaxZoom: true,
+    showCoverageOnHover: false,
+    zoomToBoundsOnClick: true,
+    maxClusterRadius: 50,
+  }).addTo(map.value);
 
   setTileLayer("streets");
 
@@ -1045,11 +990,6 @@ function initMap() {
     pane: "polygonsPane",
     style: settlementStyle,
   });
-  tradingLayer.value = L.geoJSON(undefined, {
-    pane: "polygonsPane",
-    style: tradingStyle,
-  });
-
   const pointToLayerMarker =
     (color: string, svgPath: string) => (feature: any, latlng: L.LatLng) => {
       return L.marker(latlng, {
@@ -1070,6 +1010,17 @@ function initMap() {
         }),
       });
     };
+
+  tradingLayer.value = L.geoJSON(undefined, {
+    pointToLayer: pointToLayerMarker("#f59e0b", '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>'),
+    onEachFeature: (f, l) =>
+      l.bindTooltip(f.properties?.name || "Pusat Niaga", {
+        className:
+          "bg-white dark:bg-[#1A1D1F] text-[#f59e0b] font-bold border-l-4 border-[#f59e0b] border-y border-r border-y-slate-200 border-r-slate-200 dark:border-y-[#2A2E33] dark:border-r-[#2A2E33] px-3 py-1.5 rounded-lg shadow-lg text-xs",
+        direction: "top",
+        offset: [0, -32],
+      }),
+  });
 
   const schoolSvg =
     '<path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>';
@@ -1342,9 +1293,8 @@ function renderUmkmMarkers() {
           <p><span style="color: ${popupMuted}">Kelurahan:</span> ${umkm.village_name}</p>
           <p class="pt-1"><span style="color: ${popupMuted}">Potensi:</span> <span class="font-bold uppercase tracking-wide text-${level === "tinggi" ? "emerald" : level === "sedang" ? "amber" : "rose"}-500">${umkm.potential_level}</span> (${Number(umkm.potential_score).toFixed(2)})</p>
         </div>
-        <div class="mt-4 flex space-x-2">
-          <button onclick="window.router.push('/umkm/${umkm.id}')" class="flex-1 text-xs py-2 rounded-lg font-medium transition-colors border" style="background-color: ${btnBg}; border-color: ${popupBorder}; color: ${popupText}" onmouseover="this.style.backgroundColor='${btnHover}'" onmouseout="this.style.backgroundColor='${btnBg}'">Detail</button>
-          <button onclick="window.vueAppInstance.calculateRouteTo(${lat}, ${lng})" class="flex-1 bg-[#F59E0B] hover:bg-[#D97706] text-[#111315] text-xs py-2 rounded-lg font-bold transition-colors border border-transparent">Rute</button>
+        <div class="mt-4">
+          <button onclick="window.router.push('/umkm/${umkm.id}')" class="w-full text-xs py-2 rounded-lg font-medium transition-colors border" style="background-color: ${btnBg}; border-color: ${popupBorder}; color: ${popupText}" onmouseover="this.style.backgroundColor='${btnHover}'" onmouseout="this.style.backgroundColor='${btnBg}'">Detail</button>
         </div>
       </div>
     `;
@@ -1500,20 +1450,8 @@ function getCurrentLocation() {
         lng = 106.1136;
       }
 
-      userLocation.value = L.latLng(lat, lng);
-
       if (map.value) {
-        map.value.flyTo(userLocation.value, 16);
-        routeLayer.value?.eachLayer((layer) => {
-          if ((layer as any).isUserMarker) routeLayer.value?.removeLayer(layer);
-        });
-        const marker = L.marker([lat, lng], { icon: userIcon });
-        (marker as any).isUserMarker = true;
-        marker
-          .bindPopup("<b>Lokasi Anda</b>", {
-            className: isDark.value ? "dark-popup" : "light-popup",
-          })
-          .addTo(routeLayer.value as L.LayerGroup);
+        map.value.flyTo(L.latLng(lat, lng), 16);
       }
 
       isLoading.value = false;
@@ -1523,23 +1461,8 @@ function getCurrentLocation() {
       loadingMessage.value = "Menyiapkan Lokasi Simulasi...";
 
       setTimeout(() => {
-        let lat = -1.8841;
-        let lng = 106.1136;
-
-        userLocation.value = L.latLng(lat, lng);
         if (map.value) {
-          map.value.flyTo(userLocation.value, 16);
-          routeLayer.value?.eachLayer((layer) => {
-            if ((layer as any).isUserMarker)
-              routeLayer.value?.removeLayer(layer);
-          });
-          const marker = L.marker([lat, lng], { icon: userIcon });
-          (marker as any).isUserMarker = true;
-          marker
-            .bindPopup("<b>Lokasi Simulasi</b>", {
-              className: isDark.value ? "dark-popup" : "light-popup",
-            })
-            .addTo(routeLayer.value as L.LayerGroup);
+          map.value.flyTo([-1.8841, 106.1136], 16);
         }
 
         isLoading.value = false;
@@ -1548,145 +1471,10 @@ function getCurrentLocation() {
   );
 }
 
-declare global {
-  interface Window {
-    router: any;
-    vueAppInstance: any;
-  }
-}
 
-async function calculateRouteTo(destLat: number, destLng: number) {
-  if (!userLocation.value) {
-    isLoading.value = true;
-    loadingMessage.value = "Mendeteksi Koordinat Anda...";
-    getCurrentLocation();
-
-    // Polling until userLocation is available or timeout
-    const checkLocation = setInterval(() => {
-      if (userLocation.value) {
-        clearInterval(checkLocation);
-        loadingMessage.value = "Mengkalkulasi Rute Tercepat...";
-        executeRouting(
-          userLocation.value.lat,
-          userLocation.value.lng,
-          destLat,
-          destLng,
-        );
-      }
-    }, 500);
-
-    // Timeout after 10 seconds
-    setTimeout(() => {
-      clearInterval(checkLocation);
-      if (!userLocation.value) {
-        isLoading.value = false;
-      }
-    }, 10000);
-
-    return;
-  }
-
-  isLoading.value = true;
-  loadingMessage.value = "Mengkalkulasi Rute Tercepat...";
-  executeRouting(
-    userLocation.value.lat,
-    userLocation.value.lng,
-    destLat,
-    destLng,
-  );
-}
-
-async function executeRouting(
-  startLat: number,
-  startLng: number,
-  destLat: number,
-  destLng: number,
-) {
-  routingActive.value = true;
-  routeInfo.value = { distance_km: "Menghitung...", duration_min: "-" };
-
-  try {
-    const res = await api.post("/routing", {
-      start: { lat: startLat, lng: startLng },
-      end: { lat: destLat, lng: destLng },
-    });
-
-    if (res.data && res.data.route) {
-      const geojson = res.data.route;
-
-      if (routeLayer.value) {
-        const layersToRemove: any[] = [];
-        routeLayer.value.eachLayer((l) => {
-          if (!(l as any).isUserMarker) layersToRemove.push(l);
-        });
-        layersToRemove.forEach((l) => routeLayer.value?.removeLayer(l));
-
-        const routeGeoJson = L.geoJSON(geojson, {
-          style: {
-            color: "#3b82f6",
-            weight: 6,
-            opacity: 0.9,
-            lineCap: "round",
-            lineJoin: "round",
-          },
-        });
-
-        routeGeoJson.addTo(routeLayer.value);
-
-        const distKm = res.data.summary?.distance_km?.toFixed(2) || "0.00";
-        const durMin = res.data.summary?.duration_min?.toString() || "0";
-
-        // Add tooltip directly to the route line
-        routeGeoJson.bindTooltip(
-          `<div class="text-center font-bold leading-tight">
-            <span class="text-[#3b82f6] text-sm">${distKm} Km</span><br/>
-            <span class="text-slate-600 dark:text-[#6F767E] text-[10px]">${durMin} Menit</span>
-          </div>`,
-          {
-            permanent: true,
-            direction: "center",
-            className:
-              "bg-white/95 dark:bg-[#1A1D1F]/95 border border-slate-200/50 dark:border-[#2A2E33]/50 shadow-lg rounded-xl px-3 py-1.5",
-          },
-        );
-
-        if (map.value) {
-          map.value.fitBounds(routeGeoJson.getBounds(), { padding: [50, 50] });
-        }
-
-        routeInfo.value = {
-          distance_km: distKm,
-          duration_min: durMin,
-        };
-      }
-    } else {
-      console.error("Rute tidak ditemukan.");
-    }
-  } catch (err) {
-    console.error("Routing error:", err);
-    routingActive.value = false;
-  } finally {
-    isLoading.value = false;
-  }
-}
-
-function clearRoute() {
-  routingActive.value = false;
-  routeInfo.value = null;
-  if (routeLayer.value) {
-    const layersToRemove: any[] = [];
-    routeLayer.value.eachLayer((l) => {
-      if (!(l as any).isUserMarker) layersToRemove.push(l);
-    });
-    layersToRemove.forEach((l) => routeLayer.value?.removeLayer(l));
-  }
-}
 
 onMounted(async () => {
   window.router = router;
-  window.vueAppInstance = {
-    calculateRouteTo,
-  };
 
   // Initialize Leaflet globals before loading plugins
   window.L = window.L || L;
@@ -1717,7 +1505,6 @@ onBeforeUnmount(() => {
     map.value.remove();
   }
   delete window.router;
-  delete window.vueAppInstance;
 });
 </script>
 

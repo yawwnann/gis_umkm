@@ -16,20 +16,20 @@ class UmkmController extends Controller
         $query = Umkm::with(['village', 'primaryPhoto']);
 
         // Search
-        if ($request->has('search')) {
+        if ($request->filled('search')) {
             $query->search($request->search);
         }
 
         // Filters
-        if ($request->has('category')) {
+        if ($request->filled('category')) {
             $query->filterByCategory($request->category);
         }
 
-        if ($request->has('village_id')) {
+        if ($request->filled('village_id')) {
             $query->filterByVillage($request->village_id);
         }
 
-        if ($request->has('potential_level')) {
+        if ($request->filled('potential_level')) {
             $query->filterByPotential($request->potential_level);
         }
 
@@ -87,7 +87,7 @@ class UmkmController extends Controller
         ]);
 
         // Update GeoJSON if coordinates changed
-        if ($request->has('latitude') || $request->has('longitude')) {
+        if ($request->filled('latitude') || $request->filled('longitude')) {
             $lat = $validated['latitude'] ?? $umkm->latitude;
             $lng = $validated['longitude'] ?? $umkm->longitude;
             $validated['geom'] = [

@@ -3,7 +3,6 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\MapController;
-use App\Http\Controllers\Api\RoutingController;
 use App\Http\Controllers\Api\UmkmController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\VillageController;
@@ -24,7 +23,6 @@ Route::prefix('auth')->group(function () {
 Route::prefix('map')->group(function () {
     Route::get('/umkms', [MapController::class, 'umkms']);
     Route::get('/villages', [MapController::class, 'villages']);
-    Route::get('/roads', [MapController::class, 'roads']);
     Route::get('/settlements', [MapController::class, 'settlements']);
     Route::get('/trading-centers', [MapController::class, 'tradingCenters']);
     Route::get('/schools', [MapController::class, 'schools']);
@@ -38,11 +36,6 @@ Route::prefix('heatmap')->group(function () {
     Route::get('/potential', [MapController::class, 'heatmapPotential']);
 });
 
-// Routing (OSRM) - Publicly accessible
-Route::prefix('routing')->group(function () {
-    Route::post('/', [RoutingController::class, 'route']);
-    Route::get('/nearest', [RoutingController::class, 'nearest']);
-});
 
 // Protected routes
 Route::middleware('auth:api')->group(function () {

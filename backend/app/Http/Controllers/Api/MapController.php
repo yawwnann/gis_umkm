@@ -68,14 +68,6 @@ class MapController extends Controller
         return $this->geoJSONResponse('Batas Wilayah Kelurahan', $features);
     }
 
-    public function roads(): JsonResponse
-    {
-        $roads = Road::all();
-
-        $features = $roads->map(fn($road) => $road->toGeoJSON())->toArray();
-
-        return $this->geoJSONResponse('Jaringan Jalan', $features);
-    }
 
     public function settlements(): JsonResponse
     {

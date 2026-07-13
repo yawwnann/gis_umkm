@@ -53,7 +53,7 @@
 
       <div>
         <RouterLink 
-          to="/umkm/create" 
+          to="/admin/umkm/create" 
           class="inline-flex items-center space-x-1.5 px-4 py-2 bg-[#F59E0B] hover:bg-[#D97706] text-[#111315] rounded-xl text-xs font-bold transition-colors cursor-pointer shadow-lg shadow-[#F59E0B]/20"
         >
           <Plus class="h-3.5 w-3.5" />
@@ -118,14 +118,14 @@
               </td>
               <td class="p-4 text-right space-x-1.5">
                 <RouterLink 
-                  :to="'/umkm/' + umkm.id" 
+                  :to="'/admin/umkm/' + umkm.id" 
                   class="inline-flex items-center justify-center p-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-lg hover:bg-slate-50 dark:hover:bg-[#22262A] text-slate-500 dark:text-[#6F767E] hover:text-slate-800 dark:hover:text-white transition-colors"
                   title="Lihat Detail"
                 >
                   <Eye class="h-3.5 w-3.5" />
                 </RouterLink>
                 <RouterLink 
-                  :to="'/umkm/' + umkm.id + '/edit'" 
+                  :to="'/admin/umkm/' + umkm.id + '/edit'" 
                   class="inline-flex items-center justify-center p-1.5 border border-slate-200 dark:border-[#2A2E33] rounded-lg hover:bg-slate-50 dark:hover:bg-[#22262A] text-slate-500 dark:text-[#6F767E] hover:text-slate-800 dark:hover:text-white transition-colors"
                   title="Edit Data"
                 >

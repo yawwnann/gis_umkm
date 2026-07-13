@@ -9,7 +9,7 @@ class RecalculatePotential extends Command
 {
     protected $signature = 'umkm:recalculate-potential {--umkm= : Recalculate for specific UMKM ID}';
 
-    protected $description = 'Recalculate economic potential scores for all UMKM';
+    protected $description = 'Recalculate economic potential scores for all UMKM';YUWANANTA
 
     public function handle(PotentialAnalysisService $service): int
     {

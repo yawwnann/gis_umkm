@@ -136,7 +136,7 @@
               <MapPin class="h-5 w-5 text-amber-500" />
               <span>Analisis per Kelurahan</span>
             </h3>
-            <RouterLink to="/dashboard/by-village" class="text-xs text-amber-500 hover:text-amber-600 font-medium flex items-center space-x-1">
+            <RouterLink to="/admin/dashboard/by-village" class="text-xs text-amber-500 hover:text-amber-600 font-medium flex items-center space-x-1">
               <span>Lihat Detail</span>
               <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -171,7 +171,7 @@
               <BarChart3 class="h-5 w-5 text-amber-500" />
               <span>Kategori vs Potensi</span>
             </h3>
-            <RouterLink to="/dashboard/by-category" class="text-xs text-amber-500 hover:text-amber-600 font-medium flex items-center space-x-1">
+            <RouterLink to="/admin/dashboard/by-category" class="text-xs text-amber-500 hover:text-amber-600 font-medium flex items-center space-x-1">
               <span>Lihat Detail</span>
               <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

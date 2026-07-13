@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cd C:\\\\Users\\\\HP\\\\Documents\\\\PROJEK\\\\GIS UMKM\\\\backend *)",
+      "mcp__ide__getDiagnostics",
+      "Bash(php artisan *)",
+      "Bash(git checkout *)",
+      "Bash(xxd)"
+    ]
+  }
+}

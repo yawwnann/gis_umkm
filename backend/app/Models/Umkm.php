@@ -55,6 +55,9 @@ class Umkm extends Model
 
     public function scopeSearch($query, $term)
     {
+        if (empty($term)) {
+            return $query;
+        }
         return $query
             ->where('name', 'ilike', "%{$term}%")
             ->orWhere('owner', 'ilike', "%{$term}%");

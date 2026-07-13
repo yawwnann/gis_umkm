@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-6 font-sans text-slate-900 dark:text-white transition-colors">
+  <div v-if="isAdmin" class="space-y-6 font-sans text-slate-900 dark:text-white transition-colors">
     <div class="bg-white/80 dark:bg-[#1A1D1F]/80 backdrop-blur-md border border-slate-200/50 dark:border-[#2A2E33]/50 p-6 rounded-3xl flex items-center justify-between shadow-sm">
       <div>
         <h1 class="text-xl font-bold text-slate-900 dark:text-white">{{ isEdit ? 'Ubah Data UMKM' : 'Tambah UMKM Baru' }}</h1>
@@ -52,15 +52,17 @@
         <!-- Kategori -->
         <div>
           <label for="category" class="block text-xs font-bold text-slate-500 dark:text-[#6F767E] uppercase tracking-wider mb-1">Kategori Usaha</label>
-          <select 
+          <input 
             id="category" 
             v-model="form.category" 
+            list="category-list"
             required
+            placeholder="Pilih atau ketik kategori baru"
             class="block w-full px-3 py-2 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs bg-white dark:bg-[#111315] text-slate-800 dark:text-white focus:outline-none focus:ring-1 focus:ring-[#F59E0B]"
-          >
-            <option value="" disabled>Pilih Kategori</option>
-            <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
-          </select>
+          />
+          <datalist id="category-list">
+            <option v-for="cat in categories" :key="cat" :value="cat"></option>
+          </datalist>
         </div>
 
         <!-- Kelurahan -->
@@ -156,7 +158,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, watch } from 'vue';
+import { ref, onMounted, nextTick, watch, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { Map } from 'lucide-vue-next';
 import L from 'leaflet';
@@ -331,4 +333,13 @@ async function handleSubmit() {
     submitting.value = false;
   }
 }
+
+const isAdmin = computed(() => {
+  try {
+    const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+    return userInfo.role === 'admin' || userInfo.role === 'field_officer' || true; // If they have auth token, they can view form. Usually the layout guards the route.
+  } catch(e) {
+    return false;
+  }
+});
 </script>

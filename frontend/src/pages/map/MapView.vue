@@ -679,7 +679,6 @@ const selectedCategory = ref("");
 const visibleLayers = ref({
   umkm: true,
   village: false,
-  road: false,
   settlement: false,
   trading: false,
   school: false,

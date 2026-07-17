@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Umkm;
-use App\Models\Road;
 use App\Models\TradingCenter;
 use App\Models\Settlement;
 use App\Models\Village;
@@ -13,7 +12,6 @@ use Illuminate\Support\Facades\DB;
 class PotentialAnalysisService
 {
     // Max distances in meters for normalization
-    private const MAX_ROAD_DISTANCE = 1000;   // 1km — proximity ke jalan utama
     private const MAX_TRADING_DISTANCE = 3000; // 3km — proximity ke pusat niaga
     private const MAX_SETTLEMENT_DISTANCE = 2000; // 2km — proximity ke pemukiman
     private const MAX_SCHOOL_DISTANCE = 2000; // 2km — proximity ke sekolah
@@ -35,7 +33,6 @@ class PotentialAnalysisService
             }
             // Fallbacks in case database is empty
             self::$weights = [
-                'road' => $weights['road'] ?? 0.30,
                 'trading' => $weights['trading'] ?? 0.25,
                 'settlement' => $weights['settlement'] ?? 0.15,
                 'education' => $weights['education'] ?? 0.10,
@@ -52,9 +49,6 @@ class PotentialAnalysisService
     public function calculateForUmkm(Umkm $umkm): array
     {
         $weights = $this->getWeights();
-
-        // Road access score
-        $roadScore = $this->calculateRoadScore($umkm->geom);
 
         // Trading center proximity score
         $tradingScore = $this->calculateTradingScore($umkm->geom);
@@ -73,7 +67,6 @@ class PotentialAnalysisService
 
         // Calculate total score using dynamic AHP weights (0-100)
         $totalScore = (
-            $weights['road'] * $roadScore +
             $weights['trading'] * $tradingScore +
             $weights['settlement'] * $settlementScore +
             $weights['education'] * $schoolScore +
@@ -87,7 +80,6 @@ class PotentialAnalysisService
             'score' => round($totalScore, 2),
             'level' => $level,
             'breakdown' => [
-                'road_score' => round($roadScore, 2),
                 'trading_score' => round($tradingScore, 2),
                 'settlement_score' => round($settlementScore, 2),
                 'school_score' => round($schoolScore, 2),
@@ -124,46 +116,24 @@ class PotentialAnalysisService
     }
 
     /**
-     * Calculate road proximity score
-     * Score = 100 when distance = 0, decreasing linearly to 0 at MAX_ROAD_DISTANCE
-     */
-    private function calculateRoadScore(array $geom): float
-    {
-        $geoJson = json_encode($geom);
-
-        $minDistance = DB::selectOne(
-            "SELECT ST_Distance(
-                ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON(?), 4326), 3857),
-                ST_Transform(ST_GeomFromGeoJSON(roads.geom::text), 3857)
-            ) as distance
-            FROM roads
-            WHERE roads.geom IS NOT NULL
-            ORDER BY distance
-            LIMIT 1",
-            [$geoJson]
-        )?->distance ?? self::MAX_ROAD_DISTANCE;
-
-        return max(0, 100 - ($minDistance / self::MAX_ROAD_DISTANCE * 100));
-    }
-
-    /**
      * Calculate trading center proximity score
      * Score = 100 when distance = 0, decreasing linearly to 0 at MAX_TRADING_DISTANCE
      */
     private function calculateTradingScore(array $geom): float
     {
-        $geoJson = json_encode($geom);
+        $lon = $geom['coordinates'][0];
+        $lat = $geom['coordinates'][1];
 
         $minDistance = DB::selectOne(
             "SELECT ST_Distance(
-                ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON(?), 4326), 3857),
+                ST_Transform(ST_SetSRID(ST_MakePoint(?::float8, ?::float8), 4326), 3857),
                 ST_Transform(ST_GeomFromGeoJSON(trading_centers.geom::text), 3857)
             ) as distance
             FROM trading_centers
             WHERE trading_centers.geom IS NOT NULL
             ORDER BY distance
             LIMIT 1",
-            [$geoJson]
+            [$lon, $lat]
         )?->distance ?? self::MAX_TRADING_DISTANCE;
 
         return max(0, 100 - ($minDistance / self::MAX_TRADING_DISTANCE * 100));
@@ -175,18 +145,19 @@ class PotentialAnalysisService
      */
     private function calculateSettlementScore(array $geom): float
     {
-        $geoJson = json_encode($geom);
+        $lon = $geom['coordinates'][0];
+        $lat = $geom['coordinates'][1];
 
         $minDistance = DB::selectOne(
             "SELECT ST_Distance(
-                ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON(?), 4326), 3857),
+                ST_Transform(ST_SetSRID(ST_MakePoint(?::float8, ?::float8), 4326), 3857),
                 ST_Transform(ST_GeomFromGeoJSON(settlements.geom::text), 3857)
             ) as distance
             FROM settlements
             WHERE settlements.geom IS NOT NULL
             ORDER BY distance
             LIMIT 1",
-            [$geoJson]
+            [$lon, $lat]
         )?->distance ?? self::MAX_SETTLEMENT_DISTANCE;
 
         return max(0, 100 - ($minDistance / self::MAX_SETTLEMENT_DISTANCE * 100));
@@ -198,18 +169,19 @@ class PotentialAnalysisService
      */
     private function calculateSchoolScore(array $geom): float
     {
-        $geoJson = json_encode($geom);
+        $lon = $geom['coordinates'][0];
+        $lat = $geom['coordinates'][1];
 
         $minDistance = DB::selectOne(
             "SELECT ST_Distance(
-                ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON(?), 4326), 3857),
+                ST_Transform(ST_SetSRID(ST_MakePoint(?::float8, ?::float8), 4326), 3857),
                 ST_Transform(ST_GeomFromGeoJSON(schools.geom::text), 3857)
             ) as distance
             FROM schools
             WHERE schools.geom IS NOT NULL
             ORDER BY distance
             LIMIT 1",
-            [$geoJson]
+            [$lon, $lat]
         )?->distance ?? self::MAX_SCHOOL_DISTANCE;
 
         return max(0, 100 - ($minDistance / self::MAX_SCHOOL_DISTANCE * 100));
@@ -221,18 +193,19 @@ class PotentialAnalysisService
      */
     private function calculateGovScore(array $geom): float
     {
-        $geoJson = json_encode($geom);
+        $lon = $geom['coordinates'][0];
+        $lat = $geom['coordinates'][1];
 
         $minDistance = DB::selectOne(
             "SELECT ST_Distance(
-                ST_Transform(ST_SetSRID(ST_GeomFromGeoJSON(?), 4326), 3857),
+                ST_Transform(ST_SetSRID(ST_MakePoint(?::float8, ?::float8), 4326), 3857),
                 ST_Transform(ST_GeomFromGeoJSON(government_facilities.geom::text), 3857)
             ) as distance
             FROM government_facilities
             WHERE government_facilities.geom IS NOT NULL
             ORDER BY distance
             LIMIT 1",
-            [$geoJson]
+            [$lon, $lat]
         )?->distance ?? self::MAX_GOV_DISTANCE;
 
         return max(0, 100 - ($minDistance / self::MAX_GOV_DISTANCE * 100));

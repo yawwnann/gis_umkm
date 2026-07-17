@@ -3,7 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Importers\GovernmentFacilityImporter;
-use App\Importers\RoadImporter;
 use App\Importers\SchoolImporter;
 use App\Importers\SettlementImporter;
 use App\Importers\TourismImporter;
@@ -15,7 +14,7 @@ use Illuminate\Console\Command;
 class ImportGeoJSON extends Command
 {
     protected $signature = 'geo:import
-                            {type : Type of data to import (villages, settlements, umkms, roads, trading-centers, schools, government-facilities, tourisms, all)}
+                            {type : Type of data to import (villages, settlements, umkms, trading-centers, schools, government-facilities, tourisms, all)}
                             {--force : Force re-import even if data exists}';
 
     protected $description = 'Import spatial data from GeoJSON files';
@@ -29,7 +28,6 @@ class ImportGeoJSON extends Command
             'villages' => VillageImporter::class,
             'settlements' => SettlementImporter::class,
             'umkms' => UmkmImporter::class,
-            'roads' => RoadImporter::class,
             'trading-centers' => TradingCenterImporter::class,
             'schools' => SchoolImporter::class,
             'government-facilities' => GovernmentFacilityImporter::class,

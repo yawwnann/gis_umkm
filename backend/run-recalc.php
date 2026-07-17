@@ -32,7 +32,7 @@ $svc2 = new PotentialAnalysisService();
 \App\Models\Umkm::with('village')->limit(3)->get()->each(function($u) use ($svc2) {
     $r = $svc2->calculateForUmkm($u);
     echo "UMKM: {$u->name} | Village: " . ($u->village?->name ?? 'N/A') . " (density: " . round($u->village?->density ?? 0, 1) . "/km²)\n";
-    echo "  Scores: Road={$r['breakdown']['road_score']} Trading={$r['breakdown']['trading_score']} Settlement={$r['breakdown']['settlement_score']} Density={$r['breakdown']['density_score']}\n";
+    echo "  Scores: Trading={$r['breakdown']['trading_score']} Settlement={$r['breakdown']['settlement_score']} Density={$r['breakdown']['density_score']}\n";
     echo "  TOTAL: {$r['score']} → {$r['level']->name}\n\n";
 });
 

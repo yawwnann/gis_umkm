@@ -107,16 +107,6 @@
               />
               <span class="font-medium">Fasilitas Pemerintahan</span>
             </label>
-            <label
-              class="flex items-center space-x-3 text-sm text-slate-700 dark:text-[#F0F0F0] cursor-pointer p-2 hover:bg-slate-50 dark:hover:bg-[#22262A] rounded-lg transition-colors"
-            >
-              <input
-                type="checkbox"
-                v-model="visibleLayers.tourism"
-                @change="toggleLayer('tourism')"
-                class="h-4 w-4 text-[#F59E0B] rounded border-slate-300 dark:border-[#2A2E33] bg-white dark:bg-[#111315] focus:ring-[#F59E0B] focus:ring-offset-[#1A1D1F]"
-              />
-              <span class="font-medium">Objek Wisata</span>
             </label>
           </div>
         </div>
@@ -612,7 +602,6 @@ const settlementLayer = shallowRef<L.GeoJSON | null>(null);
 const tradingLayer = shallowRef<L.GeoJSON | null>(null);
 const schoolLayer = shallowRef<L.GeoJSON | null>(null);
 const govLayer = shallowRef<L.GeoJSON | null>(null);
-const tourismLayer = shallowRef<L.GeoJSON | null>(null);
 
 const basemap = ref("streets");
 let tileLayer: L.TileLayer | null = null;
@@ -635,7 +624,6 @@ const visibleLayers = ref({
   trading: false,
   school: false,
   gov: false,
-  tourism: false,
 });
 
 const showLayerSettings = ref(false);
@@ -969,8 +957,6 @@ function initMap() {
     '<path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>';
   const govSvg =
     '<path d="M3 21h18"/><path d="M9 8h1"/><path d="M9 12h1"/><path d="M9 16h1"/><path d="M14 8h1"/><path d="M14 12h1"/><path d="M14 16h1"/><path d="M5 21V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16"/>';
-  const tourismSvg =
-    '<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>';
 
   schoolLayer.value = L.geoJSON(undefined, {
     pointToLayer: pointToLayerMarker("#10b981", schoolSvg),
@@ -986,16 +972,6 @@ function initMap() {
     pointToLayer: pointToLayerMarker("#10b981", govSvg),
     onEachFeature: (f, l) =>
       l.bindTooltip(`<div class="bg-white dark:bg-[#1A1D1F] text-[#10b981] font-bold border-l-4 border-[#10b981] border-y border-r border-y-slate-200 border-r-slate-200 dark:border-y-[#2A2E33] dark:border-r-[#2A2E33] px-3 py-1.5 rounded-lg shadow-lg text-xs whitespace-nowrap">${f.properties?.name || "Fasilitas Pemerintahan"}</div>`, {
-        className: "empty-tooltip",
-        direction: "top",
-        offset: [0, -32],
-      }),
-  });
-
-  tourismLayer.value = L.geoJSON(undefined, {
-    pointToLayer: pointToLayerMarker("#10b981", tourismSvg),
-    onEachFeature: (f, l) =>
-      l.bindTooltip(`<div class="bg-white dark:bg-[#1A1D1F] text-[#10b981] font-bold border-l-4 border-[#10b981] border-y border-r border-y-slate-200 border-r-slate-200 dark:border-y-[#2A2E33] dark:border-r-[#2A2E33] px-3 py-1.5 rounded-lg shadow-lg text-xs whitespace-nowrap">${f.properties?.name || "Objek Wisata"}</div>`, {
         className: "empty-tooltip",
         direction: "top",
         offset: [0, -32],
@@ -1115,7 +1091,6 @@ async function fetchSpatialLayer(layerName: string, layer: any) {
       trading: "/map/trading-centers",
       school: "/map/schools",
       gov: "/map/government-facilities",
-      tourism: "/map/tourisms",
     };
 
     const endpoint = endpointMap[layerName];
@@ -1275,7 +1250,6 @@ async function toggleLayer(layerName: string) {
     trading: tradingLayer.value,
     school: schoolLayer.value,
     gov: govLayer.value,
-    tourism: tourismLayer.value,
   };
 
   const layer = layerMap[layerName];

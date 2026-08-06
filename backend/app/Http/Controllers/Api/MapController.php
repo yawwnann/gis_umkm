@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\GovernmentFacility;
 use App\Models\Road;
 use App\Models\Settlement;
-use App\Models\Tourism;
 use App\Models\TradingCenter;
 use App\Models\Umkm;
 use App\Models\School;
@@ -104,16 +103,6 @@ class MapController extends Controller
 
         return $this->geoJSONResponse('Fasilitas Pemerintahan', $features);
     }
-
-    public function tourisms(): JsonResponse
-    {
-        $tourisms = Tourism::all();
-
-        $features = $tourisms->map(fn($t) => $t->toGeoJSON())->toArray();
-
-        return $this->geoJSONResponse('Objek Wisata', $features);
-    }
-
     public function heatmapUmkm(): JsonResponse
     {
         $umkms = Umkm::whereNotNull('latitude')->whereNotNull('longitude')->get();

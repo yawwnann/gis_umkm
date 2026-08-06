@@ -27,7 +27,6 @@ Route::prefix('map')->group(function () {
     Route::get('/trading-centers', [MapController::class, 'tradingCenters']);
     Route::get('/schools', [MapController::class, 'schools']);
     Route::get('/government-facilities', [MapController::class, 'governmentFacilities']);
-    Route::get('/tourisms', [MapController::class, 'tourisms']);
 });
 
 // Heatmaps - Publicly accessible

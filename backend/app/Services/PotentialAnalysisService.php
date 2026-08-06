@@ -13,6 +13,7 @@ class PotentialAnalysisService
     private const MAX_ROAD_DISTANCE = 1000;       // 1km — proximity ke jalan utama
     private const MAX_TRADING_DISTANCE = 3000;     // 3km — proximity ke pusat niaga
     private const MAX_SETTLEMENT_DISTANCE = 2000;  // 2km — proximity ke pemukiman
+    private const MAX_GOVERNMENT_DISTANCE = 2000;  // 2km — proximity ke fasilitas pemerintahan
 
     // Cache for data-driven density threshold (computed once per request)
     private static ?float $densityMaxThreshold = null;
@@ -30,9 +31,10 @@ class PotentialAnalysisService
             }
             // Fallbacks sesuai PRD — total harus = 1.0
             self::$weights = [
-                'road'               => $weights['road'] ?? 0.40,
-                'trading'            => $weights['trading'] ?? 0.30,
+                'road'               => $weights['road'] ?? 0.35,
+                'trading'            => $weights['trading'] ?? 0.25,
                 'settlement'         => $weights['settlement'] ?? 0.20,
+                'government'         => $weights['government'] ?? 0.10,
                 'population_density' => $weights['population_density'] ?? 0.10,
             ];
         }
@@ -42,9 +44,10 @@ class PotentialAnalysisService
     /**
      * Calculate potential score for a single UMKM using Weighted Overlay
      * sesuai PRD:
-     *   Akses Jalan          → 40%
-     *   Kedekatan Fasilitas Niaga → 30%
+     *   Akses Jalan          → 35%
+     *   Kedekatan Fasilitas Niaga → 25%
      *   Kawasan Pemukiman    → 20%
+     *   Fasilitas Pemerintahan → 10%
      *   Kepadatan Penduduk   → 10%
      */
     public function calculateForUmkm(Umkm $umkm): array
@@ -60,7 +63,10 @@ class PotentialAnalysisService
         // 3. Settlement proximity score (20%)
         $settlementScore = $this->calculateSettlementScore($umkm->geom);
 
-        // 4. Population density score (10%)
+        // 4. Government proximity score (10%)
+        $govScore = $this->calculateGovernmentScore($umkm->geom);
+
+        // 5. Population density score (10%)
         $densityScore = $this->calculateDensityScore($umkm->village);
 
         // Calculate total score (0-100)
@@ -68,6 +74,7 @@ class PotentialAnalysisService
             $weights['road'] * $roadScore +
             $weights['trading'] * $tradingScore +
             $weights['settlement'] * $settlementScore +
+            $weights['government'] * $govScore +
             $weights['population_density'] * $densityScore
         );
 
@@ -80,6 +87,7 @@ class PotentialAnalysisService
                 'road_score'       => round($roadScore, 2),
                 'trading_score'    => round($tradingScore, 2),
                 'settlement_score' => round($settlementScore, 2),
+                'gov_score'        => round($govScore, 2),
                 'density_score'    => round($densityScore, 2),
             ],
         ];
@@ -185,6 +193,31 @@ class PotentialAnalysisService
         )?->distance ?? self::MAX_SETTLEMENT_DISTANCE;
 
         return max(0, 100 - ($minDistance / self::MAX_SETTLEMENT_DISTANCE * 100));
+    }
+
+    /**
+     * Calculate government facility proximity score
+     * Semakin dekat dengan fasilitas pemerintahan maka skor semakin tinggi.
+     * Score = 100 when distance = 0, decreasing linearly to 0 at MAX_GOVERNMENT_DISTANCE
+     */
+    private function calculateGovernmentScore(array $geom): float
+    {
+        $lon = $geom['coordinates'][0];
+        $lat = $geom['coordinates'][1];
+
+        $minDistance = DB::selectOne(
+            "SELECT ST_Distance(
+                ST_Transform(ST_SetSRID(ST_MakePoint(?::float8, ?::float8), 4326), 3857),
+                ST_Transform(ST_GeomFromGeoJSON(government_facilities.geom::text), 3857)
+            ) as distance
+            FROM government_facilities
+            WHERE government_facilities.geom IS NOT NULL
+            ORDER BY distance
+            LIMIT 1",
+            [$lon, $lat]
+        )?->distance ?? self::MAX_GOVERNMENT_DISTANCE;
+
+        return max(0, 100 - ($minDistance / self::MAX_GOVERNMENT_DISTANCE * 100));
     }
 
     /**

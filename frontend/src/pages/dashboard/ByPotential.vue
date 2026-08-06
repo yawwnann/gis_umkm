@@ -12,17 +12,13 @@
       <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
         <div>
           <div class="flex items-center space-x-2">
-            <span class="h-4 w-4 bg-emerald-500 rounded-full"></span>
-            <h3 class="font-bold text-slate-800 dark:text-white">Potensi Tinggi</h3>
-          </div>
-          <p class="text-xs text-slate-500 dark:text-[#6F767E] mt-2">Dekat jalan utama dan pusat kegiatan ekonomi.</p>
-          <div class="text-3xl font-extrabold text-slate-900 dark:text-white mt-5">
-            {{ loading ? '...' : getCount('tinggi', '1') }}
-            <span class="text-sm font-normal text-slate-500 dark:text-[#6F767E]">UMKM</span>
+            <span class="h-4 w-4 bg-rose-500 rounded-full"></span>
+            <h3 class="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider">Potensi Tinggi</h3>
           </div>
         </div>
-        <div class="pt-5 border-t border-slate-100 dark:border-[#2A2E33] mt-5">
-          <span class="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2.5 py-1 rounded-lg">Kontribusi: {{ getPercentage(getCount('tinggi', '1')) }}%</span>
+        <div class="flex items-center justify-between">
+          <span class="text-3xl font-black text-rose-600 dark:text-rose-400">{{ loading ? '...' : getCount('tinggi', '1') }}</span>
+          <span class="text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 px-2.5 py-1 rounded-lg">Kontribusi: {{ getPercentage(getCount('tinggi', '1')) }}%</span>
         </div>
       </div>
 
@@ -30,17 +26,13 @@
       <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
         <div>
           <div class="flex items-center space-x-2">
-            <span class="h-4 w-4 bg-amber-500 rounded-full"></span>
-            <h3 class="font-bold text-slate-800 dark:text-white">Potensi Sedang</h3>
-          </div>
-          <p class="text-xs text-slate-500 dark:text-[#6F767E] mt-2">Dekat pemukiman, jarak sedang ke jalan utama.</p>
-          <div class="text-3xl font-extrabold text-slate-900 dark:text-white mt-5">
-            {{ loading ? '...' : getCount('sedang', '2') }}
-            <span class="text-sm font-normal text-slate-500 dark:text-[#6F767E]">UMKM</span>
+            <span class="h-4 w-4 bg-orange-500 rounded-full"></span>
+            <h3 class="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider">Potensi Sedang</h3>
           </div>
         </div>
-        <div class="pt-5 border-t border-slate-100 dark:border-[#2A2E33] mt-5">
-          <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 px-2.5 py-1 rounded-lg">Kontribusi: {{ getPercentage(getCount('sedang', '2')) }}%</span>
+        <div class="flex items-center justify-between">
+          <span class="text-3xl font-black text-orange-600 dark:text-orange-400">{{ loading ? '...' : getCount('sedang', '2') }}</span>
+          <span class="text-xs font-bold text-orange-600 dark:text-orange-400 bg-orange-50 dark:bg-orange-500/10 px-2.5 py-1 rounded-lg">Kontribusi: {{ getPercentage(getCount('sedang', '2')) }}%</span>
         </div>
       </div>
 
@@ -48,17 +40,13 @@
       <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-2xl p-5 shadow-xl flex flex-col justify-between">
         <div>
           <div class="flex items-center space-x-2">
-            <span class="h-4 w-4 bg-rose-500 rounded-full"></span>
-            <h3 class="font-bold text-slate-800 dark:text-white">Potensi Rendah</h3>
-          </div>
-          <p class="text-xs text-slate-500 dark:text-[#6F767E] mt-2">Jauh dari jalan utama dan pusat perniagaan.</p>
-          <div class="text-3xl font-extrabold text-slate-900 dark:text-white mt-5">
-            {{ loading ? '...' : getCount('rendah', '3') }}
-            <span class="text-sm font-normal text-slate-500 dark:text-[#6F767E]">UMKM</span>
+            <span class="h-4 w-4 bg-amber-500 rounded-full"></span>
+            <h3 class="text-sm font-bold text-slate-800 dark:text-white uppercase tracking-wider">Potensi Rendah</h3>
           </div>
         </div>
-        <div class="pt-5 border-t border-slate-100 dark:border-[#2A2E33] mt-5">
-          <span class="text-xs font-bold text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-500/10 px-2.5 py-1 rounded-lg">Kontribusi: {{ getPercentage(getCount('rendah', '3')) }}%</span>
+        <div class="flex items-center justify-between">
+          <span class="text-3xl font-black text-amber-600 dark:text-amber-400">{{ loading ? '...' : getCount('rendah', '3') }}</span>
+          <span class="text-xs font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 px-2.5 py-1 rounded-lg">Kontribusi: {{ getPercentage(getCount('rendah', '3')) }}%</span>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@
 
     <!-- Header Stats Row -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <div class="bg-amber-500 rounded-xl p-4 text-white shadow-lg">
+      <div class="bg-orange-500 rounded-xl p-4 text-white shadow-lg">
         <div class="flex items-center justify-between">
           <div>
             <p class="text-xs opacity-80 font-medium">Total UMKM</p>
@@ -34,8 +34,8 @@
             <p class="text-[10px] text-slate-400 dark:text-[#6F767E] font-medium uppercase tracking-wider">Kelurahan</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">{{ loading ? '...' : stats?.total_villages || 0 }}</p>
           </div>
-          <div class="h-10 w-10 bg-emerald-500/10 rounded-lg flex items-center justify-center">
-            <MapPin class="h-5 w-5 text-emerald-500" />
+          <div class="h-10 w-10 bg-rose-500/10 rounded-lg flex items-center justify-center">
+            <MapPin class="h-5 w-5 text-rose-500" />
           </div>
         </div>
       </div>
@@ -46,8 +46,8 @@
             <p class="text-[10px] text-slate-400 dark:text-[#6F767E] font-medium uppercase tracking-wider">Rata-rata Skor</p>
             <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">{{ loading ? '...' : (analysis.summary.avg_potential_score || 0) }}</p>
           </div>
-          <div class="h-10 w-10 bg-rose-500/10 rounded-lg flex items-center justify-center">
-            <TrendingUp class="h-5 w-5 text-rose-500" />
+          <div class="h-10 w-10 bg-amber-500/10 rounded-lg flex items-center justify-center">
+            <TrendingUp class="h-5 w-5 text-amber-500" />
           </div>
         </div>
       </div>
@@ -63,7 +63,7 @@
         <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-xl p-4">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center space-x-2">
-              <TrendingUp class="h-5 w-5 text-amber-500" />
+              <TrendingUp class="h-5 w-5 text-orange-500" />
               <span>Distribusi Potensi UMKM</span>
             </h3>
             <span class="text-xs text-slate-400 dark:text-[#6F767E]">{{ todayLabel }}</span>
@@ -71,34 +71,34 @@
 
           <!-- Potential Stats Cards -->
           <div class="grid grid-cols-3 gap-3 mb-4">
-            <div class="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 rounded-lg p-3">
+            <div class="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/40 rounded-lg p-3">
               <div class="flex items-center space-x-2 mb-1">
-                <span class="h-2.5 w-2.5 bg-emerald-500 rounded-full"></span>
-                <span class="text-xs font-semibold text-emerald-700 dark:text-emerald-400">Tinggi</span>
+                <span class="h-2.5 w-2.5 bg-rose-500 rounded-full"></span>
+                <span class="text-xs font-semibold text-rose-700 dark:text-rose-400">Tinggi</span>
               </div>
               <div class="flex items-baseline justify-between">
-                <span class="text-xl font-extrabold text-emerald-600 dark:text-emerald-400">{{ stats?.by_potential?.tinggi || 0 }}</span>
-                <span class="text-xs text-emerald-600 dark:text-emerald-500">{{ getPercentage(stats?.by_potential?.tinggi) }}%</span>
+                <span class="text-xl font-extrabold text-rose-600 dark:text-rose-400">{{ stats?.by_potential?.tinggi || 0 }}</span>
+                <span class="text-xs text-rose-600 dark:text-rose-500">{{ getPercentage(stats?.by_potential?.tinggi) }}%</span>
+              </div>
+            </div>
+            <div class="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800/40 rounded-lg p-3">
+              <div class="flex items-center space-x-2 mb-1">
+                <span class="h-2.5 w-2.5 bg-orange-500 rounded-full"></span>
+                <span class="text-xs font-semibold text-orange-700 dark:text-orange-400">Sedang</span>
+              </div>
+              <div class="flex items-baseline justify-between">
+                <span class="text-xl font-extrabold text-orange-600 dark:text-orange-400">{{ stats?.by_potential?.sedang || 0 }}</span>
+                <span class="text-xs text-orange-600 dark:text-orange-500">{{ getPercentage(stats?.by_potential?.sedang) }}%</span>
               </div>
             </div>
             <div class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-lg p-3">
               <div class="flex items-center space-x-2 mb-1">
                 <span class="h-2.5 w-2.5 bg-amber-500 rounded-full"></span>
-                <span class="text-xs font-semibold text-amber-700 dark:text-amber-400">Sedang</span>
+                <span class="text-xs font-semibold text-amber-700 dark:text-amber-400">Rendah</span>
               </div>
               <div class="flex items-baseline justify-between">
-                <span class="text-xl font-extrabold text-amber-600 dark:text-amber-400">{{ stats?.by_potential?.sedang || 0 }}</span>
-                <span class="text-xs text-amber-600 dark:text-amber-500">{{ getPercentage(stats?.by_potential?.sedang) }}%</span>
-              </div>
-            </div>
-            <div class="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800/40 rounded-lg p-3">
-              <div class="flex items-center space-x-2 mb-1">
-                <span class="h-2.5 w-2.5 bg-rose-500 rounded-full"></span>
-                <span class="text-xs font-semibold text-rose-700 dark:text-rose-400">Rendah</span>
-              </div>
-              <div class="flex items-baseline justify-between">
-                <span class="text-xl font-extrabold text-rose-600 dark:text-rose-400">{{ stats?.by_potential?.rendah || 0 }}</span>
-                <span class="text-xs text-rose-600 dark:text-rose-500">{{ getPercentage(stats?.by_potential?.rendah) }}%</span>
+                <span class="text-xl font-extrabold text-amber-600 dark:text-amber-400">{{ stats?.by_potential?.rendah || 0 }}</span>
+                <span class="text-xs text-amber-600 dark:text-amber-500">{{ getPercentage(stats?.by_potential?.rendah) }}%</span>
               </div>
             </div>
           </div>
@@ -108,21 +108,21 @@
             <div class="flex items-center space-x-3">
               <span class="text-xs font-medium text-slate-600 dark:text-[#F0F0F0] w-16">Tinggi</span>
               <div class="flex-1 bg-slate-100 dark:bg-[#111315] h-3 rounded-full overflow-hidden">
-                <div class="bg-emerald-500 h-full rounded-full transition-all duration-700" :style="{ width: getPercentage(stats?.by_potential?.tinggi) + '%' }"></div>
+                <div class="bg-rose-500 h-full rounded-full transition-all duration-700" :style="{ width: getPercentage(stats?.by_potential?.tinggi) + '%' }"></div>
               </div>
               <span class="text-xs font-bold text-slate-700 dark:text-white w-20 text-right">{{ stats?.by_potential?.tinggi || 0 }} ({{ getPercentage(stats?.by_potential?.tinggi) }}%)</span>
             </div>
             <div class="flex items-center space-x-3">
               <span class="text-xs font-medium text-slate-600 dark:text-[#F0F0F0] w-16">Sedang</span>
               <div class="flex-1 bg-slate-100 dark:bg-[#111315] h-3 rounded-full overflow-hidden">
-                <div class="bg-amber-500 h-full rounded-full transition-all duration-700" :style="{ width: getPercentage(stats?.by_potential?.sedang) + '%' }"></div>
+                <div class="bg-orange-500 h-full rounded-full transition-all duration-700" :style="{ width: getPercentage(stats?.by_potential?.sedang) + '%' }"></div>
               </div>
               <span class="text-xs font-bold text-slate-700 dark:text-white w-20 text-right">{{ stats?.by_potential?.sedang || 0 }} ({{ getPercentage(stats?.by_potential?.sedang) }}%)</span>
             </div>
             <div class="flex items-center space-x-3">
               <span class="text-xs font-medium text-slate-600 dark:text-[#F0F0F0] w-16">Rendah</span>
               <div class="flex-1 bg-slate-100 dark:bg-[#111315] h-3 rounded-full overflow-hidden">
-                <div class="bg-rose-500 h-full rounded-full transition-all duration-700" :style="{ width: getPercentage(stats?.by_potential?.rendah) + '%' }"></div>
+                <div class="bg-amber-500 h-full rounded-full transition-all duration-700" :style="{ width: getPercentage(stats?.by_potential?.rendah) + '%' }"></div>
               </div>
               <span class="text-xs font-bold text-slate-700 dark:text-white w-20 text-right">{{ stats?.by_potential?.rendah || 0 }} ({{ getPercentage(stats?.by_potential?.rendah) }}%)</span>
             </div>
@@ -133,10 +133,10 @@
         <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-xl p-4">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center space-x-2">
-              <MapPin class="h-5 w-5 text-amber-500" />
+              <MapPin class="h-5 w-5 text-orange-500" />
               <span>Analisis per Kelurahan</span>
             </h3>
-            <RouterLink to="/admin/dashboard/by-village" class="text-xs text-amber-500 hover:text-amber-600 font-medium flex items-center space-x-1">
+            <RouterLink to="/admin/dashboard/by-village" class="text-xs text-orange-500 hover:text-orange-600 font-medium flex items-center space-x-1">
               <span>Lihat Detail</span>
               <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -150,7 +150,7 @@
                 <div class="flex items-center space-x-2">
                   <span class="w-5 text-xs font-bold text-slate-400 dark:text-[#6F767E] text-right">{{ idx + 1 }}</span>
                   <span class="text-sm font-medium text-slate-700 dark:text-[#F0F0F0]">{{ item.name }}</span>
-                  <span v-if="hasMaxUmkm(item.umkm_count)" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400">TERBANYAK</span>
+                  <span v-if="hasMaxUmkm(item.umkm_count)" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400">TERBANYAK</span>
                 </div>
                 <span class="text-sm font-bold text-slate-800 dark:text-white">{{ item.umkm_count }}</span>
               </div>
@@ -168,10 +168,10 @@
         <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-xl p-4">
           <div class="flex items-center justify-between mb-4">
             <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center space-x-2">
-              <BarChart3 class="h-5 w-5 text-amber-500" />
+              <BarChart3 class="h-5 w-5 text-orange-500" />
               <span>Kategori vs Potensi</span>
             </h3>
-            <RouterLink to="/admin/dashboard/by-category" class="text-xs text-amber-500 hover:text-amber-600 font-medium flex items-center space-x-1">
+            <RouterLink to="/admin/dashboard/by-category" class="text-xs text-orange-500 hover:text-orange-600 font-medium flex items-center space-x-1">
               <span>Lihat Detail</span>
               <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -186,9 +186,9 @@
                   <th class="pb-2 pr-4 text-left">Kategori</th>
                   <th class="pb-2 pr-4 text-right">Total</th>
                   <th class="pb-2 pr-4 text-right">Rata Skor</th>
-                  <th class="pb-2 pr-4 text-right text-emerald-600">Tinggi</th>
-                  <th class="pb-2 pr-4 text-right text-amber-600">Sedang</th>
-                  <th class="pb-2 text-right text-rose-600">Rendah</th>
+                  <th class="pb-2 pr-4 text-right text-rose-600">Tinggi</th>
+                  <th class="pb-2 pr-4 text-right text-orange-600">Sedang</th>
+                  <th class="pb-2 text-right text-amber-600">Rendah</th>
                 </tr>
               </thead>
               <tbody>
@@ -196,9 +196,9 @@
                   <td class="py-2.5 pr-4 font-medium text-slate-700 dark:text-[#F0F0F0]">{{ item.category }}</td>
                   <td class="py-2.5 pr-4 text-right font-bold text-slate-800 dark:text-white">{{ item.total }}</td>
                   <td class="py-2.5 pr-4 text-right font-bold" :class="getScoreTextClass(item.avg_score)">{{ item.avg_score }}</td>
-                  <td class="py-2.5 pr-4 text-right font-semibold text-emerald-600 dark:text-emerald-400">{{ item.tinggi }}</td>
-                  <td class="py-2.5 pr-4 text-right font-semibold text-amber-600 dark:text-amber-400">{{ item.sedang }}</td>
-                  <td class="py-2.5 text-right font-semibold text-rose-600 dark:text-rose-400">{{ item.rendah }}</td>
+                  <td class="py-2.5 pr-4 text-right font-semibold text-rose-600 dark:text-rose-400">{{ item.tinggi }}</td>
+                  <td class="py-2.5 pr-4 text-right font-semibold text-orange-600 dark:text-orange-400">{{ item.sedang }}</td>
+                  <td class="py-2.5 text-right font-semibold text-amber-600 dark:text-amber-400">{{ item.rendah }}</td>
                 </tr>
               </tbody>
             </table>
@@ -212,7 +212,7 @@
         <!-- Chart Section -->
         <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-xl p-4">
           <h3 class="text-base font-bold text-slate-800 dark:text-white flex items-center space-x-2 mb-3">
-            <Activity class="h-4 w-4 text-amber-500" />
+            <Activity class="h-4 w-4 text-orange-500" />
             <span>Registrasi per Bulan</span>
           </h3>
           <div class="h-40">
@@ -228,7 +228,7 @@
         <!-- Sebaran Skor -->
         <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-xl p-4">
           <h3 class="text-base font-bold text-slate-800 dark:text-white flex items-center space-x-2 mb-3">
-            <BarChart3 class="h-4 w-4 text-amber-500" />
+            <BarChart3 class="h-4 w-4 text-orange-500" />
             <span>Sebaran Skor Potensi</span>
           </h3>
           <div class="space-y-3">
@@ -244,14 +244,14 @@
           </div>
           <div class="mt-4 pt-3 border-t border-slate-100 dark:border-[#2A2E33] flex justify-between items-center">
             <span class="text-xs font-medium text-slate-500 dark:text-[#6F767E]">Rata-rata</span>
-            <span class="text-lg font-extrabold text-amber-500">{{ analysis.summary.avg_potential_score }}</span>
+            <span class="text-lg font-extrabold text-orange-500">{{ analysis.summary.avg_potential_score }}</span>
           </div>
         </div>
 
         <!-- Distribusi Kategori -->
         <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-xl p-4">
           <h3 class="text-base font-bold text-slate-800 dark:text-white flex items-center space-x-2 mb-3">
-            <PieChart class="h-4 w-4 text-amber-500" />
+            <PieChart class="h-4 w-4 text-orange-500" />
             <span>Distribusi Kategori</span>
           </h3>
           <div class="space-y-2">
@@ -259,7 +259,7 @@
               <span class="text-xs font-medium text-slate-600 dark:text-[#F0F0F0] truncate max-w-[120px]">{{ item.category }}</span>
               <div class="flex items-center space-x-2">
                 <div class="w-20 bg-slate-100 dark:bg-[#111315] h-1.5 rounded-full overflow-hidden">
-                  <div class="bg-amber-500 h-full rounded-full" :style="{ width: getCatPercent(item.count) + '%' }"></div>
+                  <div class="bg-orange-500 h-full rounded-full" :style="{ width: getCatPercent(item.count) + '%' }"></div>
                 </div>
                 <span class="text-xs font-bold text-slate-700 dark:text-white w-6 text-right">{{ item.count }}</span>
               </div>
@@ -268,7 +268,7 @@
         </div>
 
         <!-- Top 5 UMKM -->
-        <div class="bg-amber-500 rounded-xl p-4 text-white shadow-lg">
+        <div class="bg-orange-500 rounded-xl p-4 text-white shadow-lg">
           <h3 class="text-base font-bold flex items-center space-x-2 mb-3">
             <TrendingUp class="h-4 w-4" />
             <span>Top 5 Potensi Tertinggi</span>
@@ -513,8 +513,8 @@ function getVillagePercent(count: number): number {
 function getVillageBarColor(count: number): string {
   if (maxVillageCount.value === 0) return 'bg-slate-300';
   const ratio = count / maxVillageCount.value;
-  if (ratio >= 0.8) return 'bg-emerald-500';
-  if (ratio >= 0.5) return 'bg-amber-500';
+  if (ratio >= 0.8) return 'bg-rose-500';
+  if (ratio >= 0.5) return 'bg-orange-500';
   return 'bg-slate-300 dark:bg-slate-600';
 }
 
@@ -524,10 +524,10 @@ function getScorePercent(count: number): number {
 }
 
 function getScoreColor(range: string): string {
-  if (range.startsWith('0') || range.startsWith('21')) return 'bg-rose-500';
-  if (range.startsWith('41')) return 'bg-amber-400';
-  if (range.startsWith('61')) return 'bg-amber-500';
-  return 'bg-emerald-500';
+  if (range.startsWith('0') || range.startsWith('21')) return 'bg-amber-500';
+  if (range.startsWith('41')) return 'bg-orange-400';
+  if (range.startsWith('61')) return 'bg-orange-500';
+  return 'bg-rose-500';
 }
 
 function getCatPercent(count: number): number {
@@ -536,9 +536,9 @@ function getCatPercent(count: number): number {
 }
 
 function getScoreTextClass(score: number): string {
-  if (score >= 70) return 'text-emerald-600 dark:text-emerald-400';
-  if (score >= 40) return 'text-amber-600 dark:text-amber-400';
-  return 'text-rose-600 dark:text-rose-400';
+  if (score >= 70) return 'text-rose-600 dark:text-rose-400';
+  if (score >= 40) return 'text-orange-600 dark:text-orange-400';
+  return 'text-amber-600 dark:text-amber-400';
 }
 
 function getPercentage(value: number | undefined): number {

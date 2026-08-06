@@ -29,50 +29,7 @@
         v-if="showLayerSettings"
         class="absolute top-14 left-0 mt-2 w-[280px] bg-white/95 dark:bg-[#1A1D1F]/95 backdrop-blur-xl border border-slate-200/50 dark:border-[#2A2E33]/50 rounded-2xl shadow-2xl p-5 max-h-[75vh] overflow-y-auto no-scrollbar flex flex-col space-y-5"
       >
-        <!-- Map Mode / Heatmap Selector -->
-        <div class="space-y-3">
-          <label
-            class="block text-[10px] font-bold text-slate-500 dark:text-[#6F767E] uppercase tracking-widest"
-            >Tampilan Titik UMKM</label
-          >
-          <div
-            class="flex flex-col bg-slate-100 dark:bg-[#111315] p-1 rounded-xl border border-slate-200 dark:border-[#2A2E33] transition-colors space-y-1"
-          >
-            <button
-              @click="setMapMode('markers')"
-              :class="[
-                'w-full py-2 px-3 text-xs font-bold rounded-lg transition-all text-left',
-                umkmViewMode === 'markers'
-                  ? 'bg-[#F59E0B] text-[#111315] shadow-md'
-                  : 'text-slate-500 dark:text-[#6F767E] hover:text-slate-900 dark:hover:text-white',
-              ]"
-            >
-              • Marker & Cluster
-            </button>
-            <button
-              @click="setMapMode('heatmap_density')"
-              :class="[
-                'w-full py-2 px-3 text-xs font-bold rounded-lg transition-all text-left',
-                umkmViewMode === 'heatmap_density'
-                  ? 'bg-[#F59E0B] text-[#111315] shadow-md'
-                  : 'text-slate-500 dark:text-[#6F767E] hover:text-slate-900 dark:hover:text-white',
-              ]"
-            >
-              🔥 Heatmap Persebaran
-            </button>
-            <button
-              @click="setMapMode('heatmap_potential')"
-              :class="[
-                'w-full py-2 px-3 text-xs font-bold rounded-lg transition-all text-left',
-                umkmViewMode === 'heatmap_potential'
-                  ? 'bg-[#F59E0B] text-[#111315] shadow-md'
-                  : 'text-slate-500 dark:text-[#6F767E] hover:text-slate-900 dark:hover:text-white',
-              ]"
-            >
-              💰 Heatmap Potensi Ekonomi
-            </button>
-          </div>
-        </div>
+
 
         <!-- Layers Toggle -->
         <div class="space-y-4">
@@ -102,7 +59,7 @@
                 @change="toggleLayer('village')"
                 class="h-4 w-4 text-[#F59E0B] rounded border-slate-300 dark:border-[#2A2E33] bg-white dark:bg-[#111315] focus:ring-[#F59E0B] focus:ring-offset-[#1A1D1F]"
               />
-              <span class="font-medium">Batas Kelurahan</span>
+              <span class="font-medium">Peta Potensi Kelurahan</span>
             </label>
 
             <label
@@ -467,7 +424,7 @@
           >
             <span
               class="block text-[10px] font-bold text-slate-500 dark:text-[#6F767E] uppercase tracking-widest mb-1"
-              >Infrastruktur {{ selectedVillage }}</span
+              >Batas/Potensi Kelurahan {{ selectedVillage }}</span
             >
             <div class="space-y-2.5">
               <div class="flex items-center justify-between text-xs font-bold">
@@ -512,9 +469,9 @@
             <div class="space-y-2.5">
               <div class="flex items-center justify-between text-xs font-bold">
                 <span
-                  class="flex items-center text-emerald-600 dark:text-emerald-400"
+                  class="flex items-center text-rose-600 dark:text-rose-400"
                   ><span
-                    class="w-2 h-2 rounded-full bg-emerald-500 mr-2 shadow-[0_0_8px_rgba(16,185,129,0.5)]"
+                    class="w-2 h-2 rounded-full bg-rose-500 mr-2 shadow-[0_0_8px_rgba(225,29,72,0.5)]"
                   ></span
                   >Tinggi</span
                 >
@@ -525,9 +482,9 @@
               </div>
               <div class="flex items-center justify-between text-xs font-bold">
                 <span
-                  class="flex items-center text-amber-600 dark:text-amber-400"
+                  class="flex items-center text-orange-600 dark:text-orange-400"
                   ><span
-                    class="w-2 h-2 rounded-full bg-amber-500 mr-2 shadow-[0_0_8px_rgba(245,158,11,0.5)]"
+                    class="w-2 h-2 rounded-full bg-orange-500 mr-2 shadow-[0_0_8px_rgba(249,115,22,0.5)]"
                   ></span
                   >Sedang</span
                 >
@@ -537,9 +494,9 @@
                 >
               </div>
               <div class="flex items-center justify-between text-xs font-bold">
-                <span class="flex items-center text-rose-600 dark:text-rose-400"
+                <span class="flex items-center text-amber-600 dark:text-amber-400"
                   ><span
-                    class="w-2 h-2 rounded-full bg-rose-500 mr-2 shadow-[0_0_8px_rgba(244,63,94,0.5)]"
+                    class="w-2 h-2 rounded-full bg-amber-500 mr-2 shadow-[0_0_8px_rgba(245,158,11,0.5)]"
                   ></span
                   >Rendah</span
                 >
@@ -648,11 +605,6 @@ window.addEventListener("resize", () => {
 const map = shallowRef<L.Map | null>(null);
 const umkmLayer = shallowRef<L.LayerGroup | null>(null);
 
-// Heatmap state
-const heatmapLayer = shallowRef<any>(null); // L.heatLayer
-const umkmViewMode = ref<"markers" | "heatmap_density" | "heatmap_potential">(
-  "markers",
-);
 
 // Layers state
 const villageLayer = shallowRef<L.GeoJSON | null>(null);
@@ -796,10 +748,10 @@ const createUmkmIcon = (color: string) => {
 };
 
 const markerIcons = {
-  tinggi: createUmkmIcon("#10b981"),
-  sedang: createUmkmIcon("#f59e0b"),
-  rendah: createUmkmIcon("#f43f5e"),
-  default: createUmkmIcon("#F59E0B"),
+  tinggi: createUmkmIcon("#dc2626"), // Merah
+  sedang: createUmkmIcon("#f97316"), // Oranye
+  rendah: createUmkmIcon("#facc15"), // Kuning
+  default: createUmkmIcon("#f97316"),
 };
 
 // Watch for authentication state changes
@@ -820,6 +772,7 @@ function initMap() {
   map.value = L.map("map", {
     zoomControl: false,
     maxZoom: 20,
+    preferCanvas: true, // Menggunakan Canvas rendering untuk performa super mulus pada poligon/marker
   }).setView([-1.8841, 106.1136], 13);
 
   L.control
@@ -828,13 +781,6 @@ function initMap() {
     })
     .addTo(map.value);
 
-  // Create custom pane for heatmap to ensure it renders above polygons but below markers
-  map.value.createPane("heatmapPane");
-  const heatmapPane = map.value.getPane("heatmapPane");
-  if (heatmapPane) {
-    heatmapPane.style.zIndex = "450";
-    heatmapPane.style.pointerEvents = "none";
-  }
 
   // Create custom pane for polygons so they render below the overlayPane (which is used by Leaflet heat)
   map.value.createPane("polygonsPane");
@@ -876,16 +822,16 @@ function initMap() {
 
   const getChoroplethColor = (score: number | null) => {
     if (!score) return "#94a3b8"; // slate-400 (Belum ada data)
-    if (score >= 70) return "#10b981"; // emerald-500 (Tinggi)
-    if (score >= 40) return "#f59e0b"; // amber-500 (Sedang)
-    return "#ef4444"; // rose-500 (Rendah)
+    if (score >= 70) return "#dc2626"; // red-600 (Tinggi)
+    if (score >= 40) return "#f97316"; // orange-500 (Sedang)
+    return "#facc15"; // yellow-400 (Rendah)
   };
 
   const getChoroplethBorder = (score: number | null) => {
     if (!score) return "#64748b"; // slate-500
-    if (score >= 70) return "#059669"; // emerald-600
-    if (score >= 40) return "#d97706"; // amber-600
-    return "#dc2626"; // rose-600
+    if (score >= 70) return "#991b1b"; // red-800
+    if (score >= 40) return "#c2410c"; // orange-700
+    return "#ca8a04"; // yellow-600
   };
 
   const defaultVillageStyle = (feature: any) => {
@@ -915,7 +861,7 @@ function initMap() {
           : "Belum ada data";
 
         const tooltipHtml = `
-          <div class="flex flex-col items-center p-1">
+          <div class="bg-white/95 dark:bg-[#1A1D1F]/95 border border-slate-200/50 dark:border-[#2A2E33]/50 rounded-xl shadow-xl p-3 flex flex-col items-center">
             <span class="text-[9px] font-bold text-slate-500 dark:text-[#6F767E] uppercase tracking-widest mb-0.5">Kelurahan</span>
             <span class="font-extrabold text-sm text-slate-800 dark:text-white">${feature.properties.name}</span>
             <div class="mt-1.5 px-2 py-0.5 bg-slate-100 dark:bg-[#111315] rounded-md border border-slate-200 dark:border-[#2A2E33]">
@@ -927,8 +873,7 @@ function initMap() {
         layer.bindTooltip(tooltipHtml, {
           permanent: false,
           direction: "center",
-          className:
-            "bg-white/95 dark:bg-[#1A1D1F]/95 border border-slate-200/50 dark:border-[#2A2E33]/50 rounded-xl shadow-xl !p-2",
+          className: "empty-tooltip",
         });
       }
 
@@ -1013,9 +958,8 @@ function initMap() {
   tradingLayer.value = L.geoJSON(undefined, {
     pointToLayer: pointToLayerMarker("#f59e0b", '<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>'),
     onEachFeature: (f, l) =>
-      l.bindTooltip(f.properties?.name || "Pusat Niaga", {
-        className:
-          "bg-white dark:bg-[#1A1D1F] text-[#f59e0b] font-bold border-l-4 border-[#f59e0b] border-y border-r border-y-slate-200 border-r-slate-200 dark:border-y-[#2A2E33] dark:border-r-[#2A2E33] px-3 py-1.5 rounded-lg shadow-lg text-xs",
+      l.bindTooltip(`<div class="bg-white dark:bg-[#1A1D1F] text-[#f59e0b] font-bold border-l-4 border-[#f59e0b] border-y border-r border-y-slate-200 border-r-slate-200 dark:border-y-[#2A2E33] dark:border-r-[#2A2E33] px-3 py-1.5 rounded-lg shadow-lg text-xs whitespace-nowrap">${f.properties?.name || "Pusat Niaga"}</div>`, {
+        className: "empty-tooltip",
         direction: "top",
         offset: [0, -32],
       }),
@@ -1031,9 +975,8 @@ function initMap() {
   schoolLayer.value = L.geoJSON(undefined, {
     pointToLayer: pointToLayerMarker("#10b981", schoolSvg),
     onEachFeature: (f, l) =>
-      l.bindTooltip(f.properties?.name || "Sekolah", {
-        className:
-          "bg-white dark:bg-[#1A1D1F] text-[#10b981] font-bold border-l-4 border-[#10b981] border-y border-r border-y-slate-200 border-r-slate-200 dark:border-y-[#2A2E33] dark:border-r-[#2A2E33] px-3 py-1.5 rounded-lg shadow-lg text-xs",
+      l.bindTooltip(`<div class="bg-white dark:bg-[#1A1D1F] text-[#10b981] font-bold border-l-4 border-[#10b981] border-y border-r border-y-slate-200 border-r-slate-200 dark:border-y-[#2A2E33] dark:border-r-[#2A2E33] px-3 py-1.5 rounded-lg shadow-lg text-xs whitespace-nowrap">${f.properties?.name || "Sekolah"}</div>`, {
+        className: "empty-tooltip",
         direction: "top",
         offset: [0, -32],
       }),
@@ -1042,9 +985,8 @@ function initMap() {
   govLayer.value = L.geoJSON(undefined, {
     pointToLayer: pointToLayerMarker("#10b981", govSvg),
     onEachFeature: (f, l) =>
-      l.bindTooltip(f.properties?.name || "Fasilitas Pemerintahan", {
-        className:
-          "bg-white dark:bg-[#1A1D1F] text-[#10b981] font-bold border-l-4 border-[#10b981] border-y border-r border-y-slate-200 border-r-slate-200 dark:border-y-[#2A2E33] dark:border-r-[#2A2E33] px-3 py-1.5 rounded-lg shadow-lg text-xs",
+      l.bindTooltip(`<div class="bg-white dark:bg-[#1A1D1F] text-[#10b981] font-bold border-l-4 border-[#10b981] border-y border-r border-y-slate-200 border-r-slate-200 dark:border-y-[#2A2E33] dark:border-r-[#2A2E33] px-3 py-1.5 rounded-lg shadow-lg text-xs whitespace-nowrap">${f.properties?.name || "Fasilitas Pemerintahan"}</div>`, {
+        className: "empty-tooltip",
         direction: "top",
         offset: [0, -32],
       }),
@@ -1053,9 +995,8 @@ function initMap() {
   tourismLayer.value = L.geoJSON(undefined, {
     pointToLayer: pointToLayerMarker("#10b981", tourismSvg),
     onEachFeature: (f, l) =>
-      l.bindTooltip(f.properties?.name || "Objek Wisata", {
-        className:
-          "bg-white dark:bg-[#1A1D1F] text-[#10b981] font-bold border-l-4 border-[#10b981] border-y border-r border-y-slate-200 border-r-slate-200 dark:border-y-[#2A2E33] dark:border-r-[#2A2E33] px-3 py-1.5 rounded-lg shadow-lg text-xs",
+      l.bindTooltip(`<div class="bg-white dark:bg-[#1A1D1F] text-[#10b981] font-bold border-l-4 border-[#10b981] border-y border-r border-y-slate-200 border-r-slate-200 dark:border-y-[#2A2E33] dark:border-r-[#2A2E33] px-3 py-1.5 rounded-lg shadow-lg text-xs whitespace-nowrap">${f.properties?.name || "Objek Wisata"}</div>`, {
+        className: "empty-tooltip",
         direction: "top",
         offset: [0, -32],
       }),
@@ -1190,72 +1131,13 @@ async function fetchSpatialLayer(layerName: string, layer: any) {
   }
 }
 
-async function setMapMode(
-  mode: "markers" | "heatmap_density" | "heatmap_potential",
-) {
-  if (!map.value) return;
-
-  umkmViewMode.value = mode;
-
-  // Clear existing layers
-  if (umkmLayer.value) {
-    umkmLayer.value.clearLayers();
-    map.value.removeLayer(umkmLayer.value);
-  }
-
-  if (heatmapLayer.value) {
-    map.value.removeLayer(heatmapLayer.value);
-    heatmapLayer.value = null;
-  }
-
-  if (!visibleLayers.value.umkm) return;
-
-  if (mode === "markers") {
-    map.value.addLayer(umkmLayer.value as L.LayerGroup);
-    renderUmkmMarkers();
-  } else {
-    // Fetch heatmap data
-    const endpoint =
-      mode === "heatmap_density" ? "/heatmap/umkm" : "/heatmap/potential";
-    try {
-      const res = await api.get(endpoint);
-      if (res.data && res.data.data) {
-        heatmapLayer.value = (L as any)
-          .heatLayer(res.data.data, {
-            radius: 25,
-            blur: 15,
-            maxZoom: 17,
-            max: mode === "heatmap_density" ? 1.0 : 1.5,
-            pane: "heatmapPane",
-            gradient:
-              mode === "heatmap_potential"
-                ? {
-                    0.2: "#ef4444", // Merah (Rendah)
-                    0.6: "#f59e0b", // Kuning (Sedang)
-                    1.0: "#10b981", // Hijau (Tinggi)
-                  }
-                : {
-                    0.0: "rgba(0,0,255,0)",
-                    0.3: "cyan",
-                    0.6: "lime",
-                    0.8: "yellow",
-                    1.0: "red",
-                  },
-          })
-          .addTo(map.value);
-      }
-    } catch (e) {
-      console.error("Error fetching heatmap:", e);
-    }
-  }
-}
 
 function renderUmkmMarkers() {
   if (!umkmLayer.value) return;
 
   umkmLayer.value.clearLayers();
 
-  if (!visibleLayers.value.umkm || umkmViewMode.value !== "markers") return;
+  if (!visibleLayers.value.umkm) return;
 
   filteredUmkms.value.forEach((umkm) => {
     if (!umkm.geometry || !umkm.geometry.coordinates) return;
@@ -1289,7 +1171,7 @@ function renderUmkmMarkers() {
           <p><span style="color: ${popupMuted}">Pemilik:</span> ${umkm.owner}</p>
           <p><span style="color: ${popupMuted}">Kategori:</span> ${umkm.category}</p>
           <p><span style="color: ${popupMuted}">Kelurahan:</span> ${umkm.village_name}</p>
-          <p class="pt-1"><span style="color: ${popupMuted}">Potensi:</span> <span class="font-bold uppercase tracking-wide text-${level === "tinggi" ? "emerald" : level === "sedang" ? "amber" : "rose"}-500">${umkm.potential_level}</span> (${Number(umkm.potential_score).toFixed(2)})</p>
+          <p class="pt-1"><span style="color: ${popupMuted}">Potensi:</span> <span class="font-bold uppercase tracking-wide text-${level === "tinggi" ? "rose" : level === "sedang" ? "orange" : "amber"}-500">${umkm.potential_level}</span> (${Number(umkm.potential_score).toFixed(2)})</p>
         </div>
         <div class="mt-4">
           <button onclick="window.router.push('/umkm/${umkm.id}')" class="w-full text-xs py-2 rounded-lg font-medium transition-colors border" style="background-color: ${btnBg}; border-color: ${popupBorder}; color: ${popupText}" onmouseover="this.style.backgroundColor='${btnHover}'" onmouseout="this.style.backgroundColor='${btnBg}'">Detail</button>
@@ -1372,23 +1254,16 @@ function applyFilters() {
 
   renderUmkmMarkers();
 }
-
 async function toggleLayer(layerName: string) {
   if (!map.value) return;
 
   if (layerName === "umkm") {
     if (visibleLayers.value.umkm) {
-      if (umkmViewMode.value === "markers") {
-        map.value.addLayer(umkmLayer.value as L.LayerGroup);
-        renderUmkmMarkers();
-      } else {
-        setMapMode(umkmViewMode.value);
-      }
+      map.value.addLayer(umkmLayer.value as L.LayerGroup);
+      renderUmkmMarkers();
     } else {
-      if (umkmLayer.value)
+      if (umkmLayer.value) {
         map.value.removeLayer(umkmLayer.value as L.LayerGroup);
-      if (heatmapLayer.value) {
-        map.value.removeLayer(heatmapLayer.value);
       }
     }
     return;
@@ -1470,7 +1345,6 @@ function getCurrentLocation() {
 }
 
 
-
 onMounted(async () => {
   window.router = router;
 
@@ -1546,5 +1420,16 @@ onBeforeUnmount(() => {
 .dark-popup .leaflet-popup-tip {
   background-color: #1a1d1f !important;
   border: 1px solid #2a2e33 !important;
+}
+
+/* Tooltip Theme Fix */
+.empty-tooltip {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+.empty-tooltip::before {
+  display: none !important;
 }
 </style>

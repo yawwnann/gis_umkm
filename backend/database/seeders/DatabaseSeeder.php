@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Enums\UserRole;
 use App\Importers\GovernmentFacilityImporter;
+use App\Importers\RoadImporter;
 use App\Importers\SchoolImporter;
 use App\Importers\TourismImporter;
 use App\Importers\TradingCenterImporter;
@@ -54,10 +55,12 @@ class DatabaseSeeder extends Seeder
         DB::statement('TRUNCATE TABLE schools RESTART IDENTITY CASCADE');
         DB::statement('TRUNCATE TABLE trading_centers RESTART IDENTITY CASCADE');
         DB::statement('TRUNCATE TABLE settlements RESTART IDENTITY CASCADE');
+        DB::statement('TRUNCATE TABLE roads RESTART IDENTITY CASCADE');
         DB::statement('TRUNCATE TABLE villages RESTART IDENTITY CASCADE');
 
         $importers = [
             'Villages' => VillageImporter::class,
+            'Roads' => RoadImporter::class,
             'Settlements' => SettlementImporter::class,
             'Trading Centers' => TradingCenterImporter::class,
             'Schools' => SchoolImporter::class,

@@ -26,14 +26,13 @@ class RecalculatePotential extends Command
 
             $this->info("UMKM #{$umkmId} updated:");
             $this->table(
-                ['Score', 'Level', 'Trading', 'Settlement', 'School', 'Gov', 'Density'],
+                ['Score', 'Level', 'Road', 'Trading', 'Settlement', 'Density'],
                 [[
                     $result['score'],
                     $result['level']->value ?? $result['level'],
+                    $result['breakdown']['road_score'],
                     $result['breakdown']['trading_score'],
                     $result['breakdown']['settlement_score'],
-                    $result['breakdown']['school_score'],
-                    $result['breakdown']['gov_score'],
                     $result['breakdown']['density_score'],
                 ]]
             );

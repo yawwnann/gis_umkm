@@ -13,10 +13,9 @@ $totalVillageScore = 0;
 foreach($umkms as $u) {
     $result = $service->calculateForUmkm($u);
     echo 'UMKM: ' . $u->name . ' Score: ' . $result['score'] . PHP_EOL;
+    echo '  Road: ' . $result['breakdown']['road_score'] . PHP_EOL;
     echo '  Trading: ' . $result['breakdown']['trading_score'] . PHP_EOL;
     echo '  Settlement: ' . $result['breakdown']['settlement_score'] . PHP_EOL;
-    echo '  School: ' . $result['breakdown']['school_score'] . PHP_EOL;
-    echo '  Gov: ' . $result['breakdown']['gov_score'] . PHP_EOL;
     echo '  Density: ' . $result['breakdown']['density_score'] . PHP_EOL;
     $totalVillageScore += $result['score'];
 }

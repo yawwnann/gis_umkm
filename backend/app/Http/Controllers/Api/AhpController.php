@@ -17,8 +17,8 @@ class AhpController extends Controller
     public function calculate(Request $request)
     {
         $request->validate([
-            'matrix' => 'required|array|size:6',
-            'matrix.*' => 'required|array|size:6'
+            'matrix' => 'required|array|size:4',
+            'matrix.*' => 'required|array|size:4'
         ]);
 
         $matrix = $request->matrix;
@@ -42,11 +42,11 @@ class AhpController extends Controller
     public function save(Request $request)
     {
         $request->validate([
-            'weights' => 'required|array|size:6',
+            'weights' => 'required|array|size:4',
             'weights.*' => 'required|numeric'
         ]);
 
-        $criteriaNames = ['road', 'trading', 'settlement', 'education', 'government', 'population_density'];
+        $criteriaNames = ['road', 'trading', 'settlement', 'population_density'];
         
         foreach ($request->weights as $index => $weightValue) {
             if (isset($criteriaNames[$index])) {

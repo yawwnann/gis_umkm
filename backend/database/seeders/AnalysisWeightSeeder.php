@@ -13,11 +13,10 @@ class AnalysisWeightSeeder extends Seeder
     public function run(): void
     {
         $weights = [
-            ['criteria' => 'trading', 'weight' => 0.35],
-            ['criteria' => 'settlement', 'weight' => 0.22],
-            ['criteria' => 'education', 'weight' => 0.14],
-            ['criteria' => 'government', 'weight' => 0.14],
-            ['criteria' => 'population_density', 'weight' => 0.15],
+            ['criteria' => 'road', 'weight' => 0.40],
+            ['criteria' => 'trading', 'weight' => 0.30],
+            ['criteria' => 'settlement', 'weight' => 0.20],
+            ['criteria' => 'population_density', 'weight' => 0.10],
         ];
 
         foreach ($weights as $weight) {

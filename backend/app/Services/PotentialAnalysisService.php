@@ -3,8 +3,6 @@
 namespace App\Services;
 
 use App\Models\Umkm;
-use App\Models\TradingCenter;
-use App\Models\Settlement;
 use App\Models\Village;
 use App\Enums\PotentialLevel;
 use Illuminate\Support\Facades\DB;
@@ -12,10 +10,9 @@ use Illuminate\Support\Facades\DB;
 class PotentialAnalysisService
 {
     // Max distances in meters for normalization
-    private const MAX_TRADING_DISTANCE = 3000; // 3km — proximity ke pusat niaga
-    private const MAX_SETTLEMENT_DISTANCE = 2000; // 2km — proximity ke pemukiman
-    private const MAX_SCHOOL_DISTANCE = 2000; // 2km — proximity ke sekolah
-    private const MAX_GOV_DISTANCE = 2000; // 2km — proximity ke fasilitas pemerintah
+    private const MAX_ROAD_DISTANCE = 1000;       // 1km — proximity ke jalan utama
+    private const MAX_TRADING_DISTANCE = 3000;     // 3km — proximity ke pusat niaga
+    private const MAX_SETTLEMENT_DISTANCE = 2000;  // 2km — proximity ke pemukiman
 
     // Cache for data-driven density threshold (computed once per request)
     private static ?float $densityMaxThreshold = null;
@@ -31,12 +28,11 @@ class PotentialAnalysisService
             foreach ($records as $record) {
                 $weights[$record->criteria] = $record->weight;
             }
-            // Fallbacks in case database is empty
+            // Fallbacks sesuai PRD — total harus = 1.0
             self::$weights = [
-                'trading' => $weights['trading'] ?? 0.25,
-                'settlement' => $weights['settlement'] ?? 0.15,
-                'education' => $weights['education'] ?? 0.10,
-                'government' => $weights['government'] ?? 0.10,
+                'road'               => $weights['road'] ?? 0.40,
+                'trading'            => $weights['trading'] ?? 0.30,
+                'settlement'         => $weights['settlement'] ?? 0.20,
                 'population_density' => $weights['population_density'] ?? 0.10,
             ];
         }
@@ -44,33 +40,34 @@ class PotentialAnalysisService
     }
 
     /**
-     * Calculate potential score for a single UMKM using AHP Weighted Overlay
+     * Calculate potential score for a single UMKM using Weighted Overlay
+     * sesuai PRD:
+     *   Akses Jalan          → 40%
+     *   Kedekatan Fasilitas Niaga → 30%
+     *   Kawasan Pemukiman    → 20%
+     *   Kepadatan Penduduk   → 10%
      */
     public function calculateForUmkm(Umkm $umkm): array
     {
         $weights = $this->getWeights();
 
-        // Trading center proximity score
+        // 1. Road proximity score (40%)
+        $roadScore = $this->calculateRoadScore($umkm->geom);
+
+        // 2. Trading center proximity score (30%)
         $tradingScore = $this->calculateTradingScore($umkm->geom);
 
-        // Settlement proximity score
+        // 3. Settlement proximity score (20%)
         $settlementScore = $this->calculateSettlementScore($umkm->geom);
 
-        // Population density score
+        // 4. Population density score (10%)
         $densityScore = $this->calculateDensityScore($umkm->village);
 
-        // School proximity score
-        $schoolScore = $this->calculateSchoolScore($umkm->geom);
-
-        // Government facility proximity score
-        $govScore = $this->calculateGovScore($umkm->geom);
-
-        // Calculate total score using dynamic AHP weights (0-100)
+        // Calculate total score (0-100)
         $totalScore = (
+            $weights['road'] * $roadScore +
             $weights['trading'] * $tradingScore +
             $weights['settlement'] * $settlementScore +
-            $weights['education'] * $schoolScore +
-            $weights['government'] * $govScore +
             $weights['population_density'] * $densityScore
         );
 
@@ -80,11 +77,10 @@ class PotentialAnalysisService
             'score' => round($totalScore, 2),
             'level' => $level,
             'breakdown' => [
-                'trading_score' => round($tradingScore, 2),
+                'road_score'       => round($roadScore, 2),
+                'trading_score'    => round($tradingScore, 2),
                 'settlement_score' => round($settlementScore, 2),
-                'school_score' => round($schoolScore, 2),
-                'gov_score' => round($govScore, 2),
-                'density_score' => round($densityScore, 2),
+                'density_score'    => round($densityScore, 2),
             ],
         ];
     }
@@ -94,8 +90,9 @@ class PotentialAnalysisService
      */
     public function recalculateAll(): int
     {
-        // Reset density threshold cache
+        // Reset caches
         self::$densityMaxThreshold = null;
+        self::$weights = null;
 
         $count = 0;
 
@@ -116,7 +113,33 @@ class PotentialAnalysisService
     }
 
     /**
+     * Calculate road proximity score
+     * Semakin dekat dengan jalan maka skor semakin tinggi.
+     * Score = 100 when distance = 0, decreasing linearly to 0 at MAX_ROAD_DISTANCE
+     */
+    private function calculateRoadScore(array $geom): float
+    {
+        $lon = $geom['coordinates'][0];
+        $lat = $geom['coordinates'][1];
+
+        $minDistance = DB::selectOne(
+            "SELECT ST_Distance(
+                ST_Transform(ST_SetSRID(ST_MakePoint(?::float8, ?::float8), 4326), 3857),
+                ST_Transform(ST_GeomFromGeoJSON(roads.geom::text), 3857)
+            ) as distance
+            FROM roads
+            WHERE roads.geom IS NOT NULL
+            ORDER BY distance
+            LIMIT 1",
+            [$lon, $lat]
+        )?->distance ?? self::MAX_ROAD_DISTANCE;
+
+        return max(0, 100 - ($minDistance / self::MAX_ROAD_DISTANCE * 100));
+    }
+
+    /**
      * Calculate trading center proximity score
+     * Semakin dekat dengan pasar/pusat perdagangan maka skor semakin tinggi.
      * Score = 100 when distance = 0, decreasing linearly to 0 at MAX_TRADING_DISTANCE
      */
     private function calculateTradingScore(array $geom): float
@@ -141,6 +164,7 @@ class PotentialAnalysisService
 
     /**
      * Calculate settlement proximity score
+     * Semakin dekat dengan kawasan pemukiman maka skor semakin tinggi.
      * Score = 100 when distance = 0, decreasing linearly to 0 at MAX_SETTLEMENT_DISTANCE
      */
     private function calculateSettlementScore(array $geom): float
@@ -164,57 +188,9 @@ class PotentialAnalysisService
     }
 
     /**
-     * Calculate school proximity score
-     * Score = 100 when distance = 0, decreasing linearly to 0 at MAX_SCHOOL_DISTANCE
-     */
-    private function calculateSchoolScore(array $geom): float
-    {
-        $lon = $geom['coordinates'][0];
-        $lat = $geom['coordinates'][1];
-
-        $minDistance = DB::selectOne(
-            "SELECT ST_Distance(
-                ST_Transform(ST_SetSRID(ST_MakePoint(?::float8, ?::float8), 4326), 3857),
-                ST_Transform(ST_GeomFromGeoJSON(schools.geom::text), 3857)
-            ) as distance
-            FROM schools
-            WHERE schools.geom IS NOT NULL
-            ORDER BY distance
-            LIMIT 1",
-            [$lon, $lat]
-        )?->distance ?? self::MAX_SCHOOL_DISTANCE;
-
-        return max(0, 100 - ($minDistance / self::MAX_SCHOOL_DISTANCE * 100));
-    }
-
-    /**
-     * Calculate government facility proximity score
-     * Score = 100 when distance = 0, decreasing linearly to 0 at MAX_GOV_DISTANCE
-     */
-    private function calculateGovScore(array $geom): float
-    {
-        $lon = $geom['coordinates'][0];
-        $lat = $geom['coordinates'][1];
-
-        $minDistance = DB::selectOne(
-            "SELECT ST_Distance(
-                ST_Transform(ST_SetSRID(ST_MakePoint(?::float8, ?::float8), 4326), 3857),
-                ST_Transform(ST_GeomFromGeoJSON(government_facilities.geom::text), 3857)
-            ) as distance
-            FROM government_facilities
-            WHERE government_facilities.geom IS NOT NULL
-            ORDER BY distance
-            LIMIT 1",
-            [$lon, $lat]
-        )?->distance ?? self::MAX_GOV_DISTANCE;
-
-        return max(0, 100 - ($minDistance / self::MAX_GOV_DISTANCE * 100));
-    }
-
-    /**
      * Calculate density score based on village population density
      *
-     * Uses a data-driven max threshold (90th percentile of actual densities)
+     * Uses a data-driven max threshold (second highest density)
      * instead of an arbitrary fixed value. Falls back to 50 (medium score)
      * if no density data is available.
      */
@@ -242,16 +218,16 @@ class PotentialAnalysisService
 
     /**
      * Determine potential level from score
-     * Thresholds are based on the 4-factor weighted model:
+     * Thresholds berdasarkan 4-factor weighted model (total bobot = 1.0):
      *   >= 70: Tinggi  (mendapat manfaat maksimal dari infrastruktur & demografi)
-     *   40-69: Sedang (terdampak tapi tidak optimal)
+     *   40-69: Sedang  (terdampak tapi tidak optimal)
      *   < 40:  Rendah  (terisolasi atau di area jarang penduduk)
      */
     private function determineLevel(float $score): PotentialLevel
     {
-        if ($score >= 80) {
+        if ($score >= 70) {
             return PotentialLevel::Tinggi;
-        } elseif ($score >= 60) {
+        } elseif ($score >= 40) {
             return PotentialLevel::Sedang;
         } else {
             return PotentialLevel::Rendah;

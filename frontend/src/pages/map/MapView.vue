@@ -861,31 +861,31 @@ function initMap() {
   };
 
   const settlementStyle = {
-    color: "#f59e0b",
+    color: "#a855f7",
     weight: 1,
-    fillColor: "#f59e0b",
+    fillColor: "#a855f7",
     fillOpacity: 0.2,
   };
 
   const tradingStyle = {
-    color: "#10b981",
+    color: "#3b82f6",
     weight: 1,
-    fillColor: "#10b981",
+    fillColor: "#3b82f6",
     fillOpacity: 0.2,
   };
 
   const getChoroplethColor = (score: number | null) => {
     if (!score) return "#94a3b8"; // slate-400 (Belum ada data)
-    if (score >= 80) return "#ef4444"; // rose-500 (Tinggi)
-    if (score >= 60) return "#f59e0b"; // amber-500 (Sedang)
-    return "#10b981"; // emerald-500 (Rendah)
+    if (score >= 70) return "#10b981"; // emerald-500 (Tinggi)
+    if (score >= 40) return "#f59e0b"; // amber-500 (Sedang)
+    return "#ef4444"; // rose-500 (Rendah)
   };
 
   const getChoroplethBorder = (score: number | null) => {
     if (!score) return "#64748b"; // slate-500
-    if (score >= 80) return "#dc2626"; // rose-600
-    if (score >= 60) return "#d97706"; // amber-600
-    return "#059669"; // emerald-600
+    if (score >= 70) return "#059669"; // emerald-600
+    if (score >= 40) return "#d97706"; // amber-600
+    return "#dc2626"; // rose-600
   };
 
   const defaultVillageStyle = (feature: any) => {
@@ -1225,15 +1225,14 @@ async function setMapMode(
             radius: 25,
             blur: 15,
             maxZoom: 17,
+            max: mode === "heatmap_density" ? 1.0 : 1.5,
             pane: "heatmapPane",
             gradient:
               mode === "heatmap_potential"
                 ? {
-                    0.0: "rgba(0,0,255,0)",
-                    0.3: "blue",
-                    0.6: "yellow",
-                    0.8: "orange",
-                    1.0: "red",
+                    0.2: "#ef4444", // Merah (Rendah)
+                    0.6: "#f59e0b", // Kuning (Sedang)
+                    1.0: "#10b981", // Hijau (Tinggi)
                   }
                 : {
                     0.0: "rgba(0,0,255,0)",

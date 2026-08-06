@@ -145,25 +145,32 @@ class MapController extends Controller
             ->whereNotNull('potential_score')
             ->get();
 
-        // Use fixed potential level thresholds for intensity anchors
-        // so heatmap is consistent regardless of actual score distribution
-        $data = $umkms->map(function ($umkm) {
-            $score = (float) $umkm->potential_score;
+        // Group by roughly 100m grid to prevent Leaflet.heat from summing up 
+        // overlapping UMKM and turning low potential into high potential visually.
+        $grouped = $umkms->groupBy(function ($umkm) {
+            return round((float) $umkm->latitude, 3) . ',' . round((float) $umkm->longitude, 3);
+        });
 
-            // Fixed thresholds: rendah < 40, sedang 40-69, tinggi >= 70
-            // Normalize to 0-1 range using fixed anchors
+        $data = $grouped->map(function ($group) {
+            $lat = round((float) $group->first()->latitude, 3);
+            $lng = round((float) $group->first()->longitude, 3);
+            
+            // Average potential in this grid
+            $avgScore = $group->avg('potential_score');
+
+            // Fixed intensities: Rendah (0.2), Sedang (0.6), Tinggi (1.0)
             $intensity = match (true) {
-                $score >= 70 => 0.75 + (min($score, 100) - 70) / 30 * 0.25, // 0.75-1.0
-                $score >= 40 => 0.35 + ($score - 40) / 30 * 0.40,           // 0.35-0.75
-                default      => max(0, $score / 40 * 0.35),                  // 0.0-0.35
+                $avgScore >= 70 => 1.0,
+                $avgScore >= 40 => 0.6,
+                default         => 0.2,
             };
 
             return [
-                (float) $umkm->latitude,
-                (float) $umkm->longitude,
+                (float) $lat,
+                (float) $lng,
                 $intensity,
             ];
-        });
+        })->values();
 
         return response()->json([
             'data' => $data

@@ -14,6 +14,7 @@ class PotentialAnalysisService
     private const MAX_TRADING_DISTANCE = 3000;     // 3km — proximity ke pusat niaga
     private const MAX_SETTLEMENT_DISTANCE = 2000;  // 2km — proximity ke pemukiman
     private const MAX_GOVERNMENT_DISTANCE = 2000;  // 2km — proximity ke fasilitas pemerintahan
+    private const MAX_EDUCATION_DISTANCE = 2000;   // 2km — proximity ke sekolah
 
     // Cache for data-driven density threshold (computed once per request)
     private static ?float $densityMaxThreshold = null;
@@ -31,10 +32,11 @@ class PotentialAnalysisService
             }
             // Fallbacks sesuai PRD — total harus = 1.0
             self::$weights = [
-                'road'               => $weights['road'] ?? 0.35,
+                'road'               => $weights['road'] ?? 0.30,
                 'trading'            => $weights['trading'] ?? 0.25,
-                'settlement'         => $weights['settlement'] ?? 0.20,
+                'settlement'         => $weights['settlement'] ?? 0.15,
                 'government'         => $weights['government'] ?? 0.10,
+                'education'          => $weights['education'] ?? 0.10,
                 'population_density' => $weights['population_density'] ?? 0.10,
             ];
         }
@@ -43,30 +45,34 @@ class PotentialAnalysisService
 
     /**
      * Calculate potential score for a single UMKM using Weighted Overlay
-     * sesuai PRD:
-     *   Akses Jalan          → 35%
+     * sesuai PRD baru:
+     *   Akses Jalan          → 30%
      *   Kedekatan Fasilitas Niaga → 25%
-     *   Kawasan Pemukiman    → 20%
+     *   Kawasan Pemukiman    → 15%
      *   Fasilitas Pemerintahan → 10%
+     *   Fasilitas Pendidikan   → 10%
      *   Kepadatan Penduduk   → 10%
      */
     public function calculateForUmkm(Umkm $umkm): array
     {
         $weights = $this->getWeights();
 
-        // 1. Road proximity score (40%)
+        // 1. Road proximity score (30%)
         $roadScore = $this->calculateRoadScore($umkm->geom);
 
-        // 2. Trading center proximity score (30%)
+        // 2. Trading center proximity score (25%)
         $tradingScore = $this->calculateTradingScore($umkm->geom);
 
-        // 3. Settlement proximity score (20%)
+        // 3. Settlement proximity score (15%)
         $settlementScore = $this->calculateSettlementScore($umkm->geom);
 
         // 4. Government proximity score (10%)
         $govScore = $this->calculateGovernmentScore($umkm->geom);
 
-        // 5. Population density score (10%)
+        // 5. Education proximity score (10%)
+        $educationScore = $this->calculateEducationScore($umkm->geom);
+
+        // 6. Population density score (10%)
         $densityScore = $this->calculateDensityScore($umkm->village);
 
         // Calculate total score (0-100)
@@ -75,6 +81,7 @@ class PotentialAnalysisService
             $weights['trading'] * $tradingScore +
             $weights['settlement'] * $settlementScore +
             $weights['government'] * $govScore +
+            $weights['education'] * $educationScore +
             $weights['population_density'] * $densityScore
         );
 
@@ -88,6 +95,7 @@ class PotentialAnalysisService
                 'trading_score'    => round($tradingScore, 2),
                 'settlement_score' => round($settlementScore, 2),
                 'gov_score'        => round($govScore, 2),
+                'education_score'  => round($educationScore, 2),
                 'density_score'    => round($densityScore, 2),
             ],
         ];
@@ -218,6 +226,31 @@ class PotentialAnalysisService
         )?->distance ?? self::MAX_GOVERNMENT_DISTANCE;
 
         return max(0, 100 - ($minDistance / self::MAX_GOVERNMENT_DISTANCE * 100));
+    }
+
+    /**
+     * Calculate education facility proximity score
+     * Semakin dekat dengan sekolah maka skor semakin tinggi.
+     * Score = 100 when distance = 0, decreasing linearly to 0 at MAX_EDUCATION_DISTANCE
+     */
+    private function calculateEducationScore(array $geom): float
+    {
+        $lon = $geom['coordinates'][0];
+        $lat = $geom['coordinates'][1];
+
+        $minDistance = DB::selectOne(
+            "SELECT ST_Distance(
+                ST_Transform(ST_SetSRID(ST_MakePoint(?::float8, ?::float8), 4326), 3857),
+                ST_Transform(ST_GeomFromGeoJSON(schools.geom::text), 3857)
+            ) as distance
+            FROM schools
+            WHERE schools.geom IS NOT NULL
+            ORDER BY distance
+            LIMIT 1",
+            [$lon, $lat]
+        )?->distance ?? self::MAX_EDUCATION_DISTANCE;
+
+        return max(0, 100 - ($minDistance / self::MAX_EDUCATION_DISTANCE * 100));
     }
 
     /**

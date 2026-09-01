@@ -174,11 +174,26 @@ class DashboardController extends Controller
         $scoreCount = $scores->count();
 
         foreach ($scores as $score) {
+            $matched = false;
             foreach ($scoreBuckets as &$bucket) {
-                if ($score >= $bucket['min'] && $score <= $bucket['max']) {
-                    $bucket['count']++;
-                    break;
+                // Untuk bucket terakhir (81-100), tangkap semua skor >= 81 (termasuk jika ada > 100)
+                if ($bucket['range'] === '81-100') {
+                    if ($score >= $bucket['min']) {
+                        $bucket['count']++;
+                        $matched = true;
+                        break;
+                    }
+                } else {
+                    if ($score >= $bucket['min'] && $score <= $bucket['max']) {
+                        $bucket['count']++;
+                        $matched = true;
+                        break;
+                    }
                 }
+            }
+            // Jika karena alasan presisi desimal belum masuk bucket manapun, masukkan ke bucket terdekat/terakhir
+            if (!$matched && count($scoreBuckets) > 0) {
+                $scoreBuckets[count($scoreBuckets) - 1]['count']++;
             }
         }
         unset($bucket);

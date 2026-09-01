@@ -33,35 +33,59 @@
         </div>
       </div>
 
+      <!-- Ringkasan yang Dirombak dan Diperkaya -->
       <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 p-5 rounded-2xl shadow-xl flex flex-col justify-between">
         <div>
-          <h3 class="font-bold text-slate-800 dark:text-white border-b border-slate-100 dark:border-[#2A2E33] pb-4 mb-5">Ringkasan</h3>
+          <h3 class="font-bold text-slate-800 dark:text-white border-b border-slate-100 dark:border-[#2A2E33] pb-4 mb-5 flex items-center space-x-2">
+            <PieChart class="w-4 h-4 text-[#F59E0B]" />
+            <span>Ringkasan Komprehensif</span>
+          </h3>
           
           <div v-if="loading" class="space-y-4">
-            <div class="h-12 bg-slate-100 dark:bg-[#22262A] animate-pulse rounded" v-for="i in 2" :key="i"></div>
+            <div class="h-16 bg-slate-100 dark:bg-[#22262A] animate-pulse rounded-xl" v-for="i in 3" :key="i"></div>
           </div>
 
-          <div v-else class="space-y-5">
-            <div>
-              <span class="text-[10px] font-bold text-slate-400 dark:text-[#6F767E] uppercase tracking-wider">Kategori Terbanyak</span>
-              <h4 class="text-lg font-bold text-slate-800 dark:text-white mt-1">{{ topCategory?.category || '-' }}</h4>
-              <p class="text-xs text-slate-500 dark:text-[#6F767E] mt-0.5">{{ topCategory?.count || 0 }} pelaku usaha kuliner.</p>
+          <div v-else class="space-y-4">
+            <!-- Card 1: Kategori Terbanyak -->
+            <div class="p-3.5 bg-gradient-to-br from-amber-500/10 to-transparent border border-amber-500/20 rounded-xl">
+              <span class="block text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider">Kategori Terbanyak</span>
+              <h4 class="text-base font-extrabold text-slate-800 dark:text-white mt-1">{{ topCategory?.category || '-' }}</h4>
+              <div class="flex justify-between items-center mt-2 text-xs">
+                <span class="text-slate-500 dark:text-[#6F767E] font-medium">Jumlah Unit Usaha</span>
+                <span class="font-bold text-slate-700 dark:text-white">{{ topCategory?.count || 0 }} UMKM ({{ getPercentage(topCategory?.count || 0) }}%)</span>
+              </div>
             </div>
-            <div>
-              <span class="text-[10px] font-bold text-slate-400 dark:text-[#6F767E] uppercase tracking-wider">Total Kategori</span>
-              <h4 class="text-lg font-bold text-slate-800 dark:text-white mt-1">{{ items.length }} Kategori</h4>
+
+            <!-- Card 2: Total Kategori & Diversifikasi -->
+            <div class="p-3.5 bg-slate-50 dark:bg-[#111315] border border-slate-200/50 dark:border-[#2A2E33] rounded-xl">
+              <span class="block text-[10px] font-bold text-slate-400 dark:text-[#6F767E] uppercase tracking-wider">Total Ragam Kategori</span>
+              <div class="flex items-baseline justify-between mt-1">
+                <h4 class="text-lg font-extrabold text-slate-800 dark:text-white">{{ items.length }} Kategori</h4>
+                <span class="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 px-2 py-0.5 rounded">Diversifikasi Baik</span>
+              </div>
+            </div>
+
+            <!-- Card 3: Rata-rata per Kategori -->
+            <div class="p-3.5 bg-slate-50 dark:bg-[#111315] border border-slate-200/50 dark:border-[#2A2E33] rounded-xl">
+              <span class="block text-[10px] font-bold text-slate-400 dark:text-[#6F767E] uppercase tracking-wider">Rata-rata Usaha per Kategori</span>
+              <div class="flex items-baseline justify-between mt-1">
+                <h4 class="text-lg font-extrabold text-slate-800 dark:text-white">{{ averagePerCategory }} UMKM</h4>
+                <span class="text-[11px] text-slate-500 dark:text-[#6F767E]">Dari total {{ totalCount }} UMKM</span>
+              </div>
+            </div>
+
+            <!-- Card 4: Kategori Terendah / Minoritas -->
+            <div v-if="bottomCategory" class="p-3.5 bg-slate-50 dark:bg-[#111315] border border-slate-200/50 dark:border-[#2A2E33] rounded-xl">
+              <span class="block text-[10px] font-bold text-slate-400 dark:text-[#6F767E] uppercase tracking-wider">Kategori Minoritas</span>
+              <div class="flex items-baseline justify-between mt-1">
+                <h4 class="text-sm font-bold text-slate-800 dark:text-white truncate max-w-[140px]">{{ bottomCategory.category }}</h4>
+                <span class="text-xs font-bold text-slate-700 dark:text-white">{{ bottomCategory.count }} UMKM</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="pt-5 border-t border-slate-100 dark:border-[#2A2E33] mt-5">
-          <RouterLink 
-            to="/umkm" 
-            class="w-full flex items-center justify-center px-4 py-2 border border-slate-200 dark:border-[#2A2E33] text-xs font-semibold rounded-xl text-slate-700 dark:text-[#F0F0F0] bg-white dark:bg-[#111315] hover:bg-slate-50 dark:hover:bg-[#22262A] transition-colors"
-          >
-            Filter UMKM Kategori &rarr;
-          </RouterLink>
-        </div>
+      
       </div>
     </div>
   </div>
@@ -70,6 +94,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { RouterLink } from 'vue-router';
+import { PieChart } from 'lucide-vue-next';
 import api from '../../services/api';
 
 interface CategoryStatItem {
@@ -91,6 +116,16 @@ const totalCount = computed(() => {
 
 const topCategory = computed(() => {
   return sortedItems.value[0] || null;
+});
+
+const bottomCategory = computed(() => {
+  if (sortedItems.value.length < 2) return null;
+  return sortedItems.value[sortedItems.value.length - 1] || null;
+});
+
+const averagePerCategory = computed(() => {
+  if (items.value.length === 0) return 0;
+  return (totalCount.value / items.value.length).toFixed(1);
 });
 
 async function fetchData() {

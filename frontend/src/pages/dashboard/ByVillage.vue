@@ -21,22 +21,8 @@
           Tidak ada data wilayah tersedia.
         </div>
 
-        <div v-else class="space-y-4">
-          <div v-for="item in sortedItems" :key="item.id" class="space-y-1.5">
-            <div class="flex justify-between text-sm">
-              <span class="font-medium text-slate-700 dark:text-[#F0F0F0]">{{ item.name }}</span>
-              <span class="font-bold text-slate-900 dark:text-white">{{ item.umkm_count }} UMKM</span>
-            </div>
-            <div class="flex items-center space-x-3">
-              <div class="flex-1 bg-slate-100 dark:bg-[#111315] h-5 rounded-lg overflow-hidden">
-                <div 
-                  class="bg-[#F59E0B] h-full transition-all duration-500 rounded-lg" 
-                  :style="{ width: getPercentage(item.umkm_count) + '%' }"
-                ></div>
-              </div>
-              <span class="text-xs text-slate-400 dark:text-[#6F767E] font-medium w-8 text-right">{{ getPercentage(item.umkm_count) }}%</span>
-            </div>
-          </div>
+        <div v-else class="h-[420px]">
+          <Bar :data="chartData" :options="chartOptions" />
         </div>
       </div>
 
@@ -82,7 +68,18 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { RouterLink } from 'vue-router';
+import { Bar } from 'vue-chartjs';
+import {
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  Legend,
+  LinearScale,
+  Tooltip,
+} from 'chart.js';
 import api from '../../services/api';
+
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 interface VillageStatItem {
   id: number;
@@ -102,6 +99,52 @@ const sortedItems = computed(() => {
 const totalCount = computed(() => {
   return items.value.reduce((sum, item) => sum + item.umkm_count, 0);
 });
+
+const chartData = computed(() => ({
+  labels: sortedItems.value.map(item => item.name),
+  datasets: [{
+    label: 'Jumlah UMKM',
+    data: sortedItems.value.map(item => item.umkm_count),
+    backgroundColor: '#F59E0B',
+    hoverBackgroundColor: '#D97706',
+    borderRadius: 8,
+    borderSkipped: false,
+    barPercentage: 0.7,
+    categoryPercentage: 0.8,
+  }],
+}));
+
+const chartOptions = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      callbacks: {
+        label: (context: any) => ` ${context.parsed.y} UMKM`,
+      },
+    },
+  },
+  scales: {
+    x: {
+      grid: { display: false },
+      ticks: {
+        autoSkip: false,
+        maxRotation: 45,
+        minRotation: 45,
+      },
+    },
+    y: {
+      beginAtZero: true,
+      ticks: {
+        precision: 0,
+      },
+      grid: {
+        color: 'rgba(148, 163, 184, 0.15)',
+      },
+    },
+  },
+}));
 
 async function fetchData() {
   loading.value = true;

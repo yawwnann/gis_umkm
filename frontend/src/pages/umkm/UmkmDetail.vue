@@ -317,17 +317,13 @@ function initDetailMap() {
   
   L.control.zoom({ position: 'topright' }).addTo(detailMap.value);
 
-  // Dark mode support with CartoDB dark tiles
-  const tileUrl = isDark.value
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  // Standard OSM tiles
+  const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
   tileLayer = L.tileLayer(tileUrl, {
     maxZoom: 19,
-    attribution: isDark.value
-      ? '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    subdomains: isDark.value ? 'abcd' : 'a',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    subdomains: 'abc',
   }).addTo(detailMap.value);
 
   const normLevel = String(umkm.value.potential_level).toLowerCase();

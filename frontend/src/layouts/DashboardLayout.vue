@@ -28,17 +28,7 @@
           <LayoutDashboard class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:scale-110" />
           <span class="ml-3.5 font-semibold text-[13px] tracking-wide">Dashboard</span>
         </RouterLink>
-
-        <RouterLink
-          to="/admin/dashboard/by-village"
-          class="relative w-full h-12 rounded-2xl flex items-center px-4 transition-all duration-300 group overflow-hidden"
-          :class="isRouteActive('/admin/dashboard/by-village') ? 'bg-amber-500 text-[#111315]' : 'text-slate-500 dark:text-[#8B949E] hover:bg-slate-100/80 dark:hover:bg-[#22262A] hover:text-slate-900 dark:hover:text-white'"
-        >
-          <div v-if="isRouteActive('/admin/dashboard/by-village')" class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-          <BarChart3 class="h-5 w-5 shrink-0 transition-transform duration-300 group-hover:scale-110" />
-          <span class="ml-3.5 font-semibold text-[13px] tracking-wide">Statistik Kelurahan</span>
-        </RouterLink>
-
+ 
         <RouterLink
           to="/admin/dashboard/by-category"
           class="relative w-full h-12 rounded-2xl flex items-center px-4 transition-all duration-300 group overflow-hidden"

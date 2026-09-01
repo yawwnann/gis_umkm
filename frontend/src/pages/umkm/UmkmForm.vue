@@ -259,17 +259,13 @@ function initFormMap() {
     zoom: 14
   });
 
-  // Dark mode support with CartoDB dark tiles
-  const tileUrl = isDark.value
-    ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-    : 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+  // Standard OSM tiles
+  const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
   formTileLayer = L.tileLayer(tileUrl, {
     maxZoom: 19,
-    attribution: isDark.value
-      ? '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-      : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    subdomains: isDark.value ? 'abcd' : 'a',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    subdomains: 'abc',
   }).addTo(formMap);
 
   // Set up coordinate picking marker

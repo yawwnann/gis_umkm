@@ -9,7 +9,7 @@
         <p class="text-slate-500 dark:text-[#6F767E] text-sm mt-1">Informasi atribut spasial dan demografi penduduk kelurahan.</p>
       </div>
       <button 
-        @click="$router.push('/villages')" 
+        @click="$router.push('/admin/villages')" 
         class="px-4 py-2 border border-slate-200 dark:border-[#2A2E33] rounded-xl text-xs font-semibold hover:bg-slate-50 dark:hover:bg-[#22262A] text-slate-700 dark:text-[#F0F0F0] bg-white dark:bg-[#1A1D1F] transition-colors cursor-pointer"
       >
         Kembali

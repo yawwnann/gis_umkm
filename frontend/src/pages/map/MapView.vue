@@ -107,7 +107,7 @@
               />
               <span class="font-medium">Fasilitas Pemerintahan</span>
             </label>
-            </label>
+            
           </div>
         </div>
 
@@ -987,17 +987,13 @@ function setTileLayer(type: string) {
   basemap.value = type;
 
   if (type === "streets") {
-    // OSM / CartoDB tiles based on theme
-    const url = isDark.value
-      ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-      : "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+    // Standard OSM tiles for both light and dark mode
+    const url = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
 
     tileLayer = L.tileLayer(url, {
       maxZoom: 19,
-      attribution: isDark.value
-        ? '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-      subdomains: isDark.value ? 'abcd' : 'a',
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      subdomains: 'abc',
     });
   } else {
     // Satellite - Esri World Imagery (free)

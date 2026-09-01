@@ -144,23 +144,13 @@
             </RouterLink>
           </div>
 
-          <div class="space-y-3">
-            <div v-for="(item, idx) in sortedVillages.slice(0, 8)" :key="item.id" class="group">
-              <div class="flex justify-between items-center mb-1">
-                <div class="flex items-center space-x-2">
-                  <span class="w-5 text-xs font-bold text-slate-400 dark:text-[#6F767E] text-right">{{ idx + 1 }}</span>
-                  <span class="text-sm font-medium text-slate-700 dark:text-[#F0F0F0]">{{ item.name }}</span>
-                  <span v-if="hasMaxUmkm(item.umkm_count)" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400">TERBANYAK</span>
-                </div>
-                <span class="text-sm font-bold text-slate-800 dark:text-white">{{ item.umkm_count }}</span>
-              </div>
-              <div class="flex items-center space-x-2">
-                <div class="flex-1 bg-slate-100 dark:bg-[#111315] h-2 rounded-full overflow-hidden">
-                  <div class="h-full rounded-full transition-all duration-700" :class="getVillageBarColor(item.umkm_count)" :style="{ width: getVillagePercent(item.umkm_count) + '%' }"></div>
-                </div>
-                <span class="text-xs font-medium text-slate-500 dark:text-[#6F767E] w-12 text-right">{{ getVillagePercent(item.umkm_count) }}%</span>
-              </div>
-            </div>
+          <div class="h-64">
+            <Bar
+              v-if="sortedVillages.length"
+              :data="villageChartData"
+              :options="villageChartOptions"
+              :key="isDark ? 'dark' : 'light'"
+            />
           </div>
         </div>
 
@@ -209,19 +199,23 @@
       <!-- Right Column: 1/3 width -->
       <div class="space-y-4">
 
-        <!-- Chart Section -->
-        <div class="bg-white/85 dark:bg-[#1A1D1F]/90 backdrop-blur-xl border border-slate-200/40 dark:border-[#2A2E33]/60 rounded-xl p-4">
-          <h3 class="text-base font-bold text-slate-800 dark:text-white flex items-center space-x-2 mb-3">
-            <Activity class="h-4 w-4 text-orange-500" />
-            <span>Registrasi per Bulan</span>
+        <!-- Top 5 UMKM -->
+        <div class="bg-orange-500 rounded-xl p-4 text-white shadow-lg">
+          <h3 class="text-base font-bold flex items-center space-x-2 mb-3">
+            <TrendingUp class="h-4 w-4" />
+            <span>Top 5 Potensi Tertinggi</span>
           </h3>
-          <div class="h-40">
-            <Line
-              v-if="monthlyRegistrations.length"
-              :data="chartData"
-              :options="chartOptions"
-              :key="isDark ? 'dark' : 'light'"
-            />
+          <div class="space-y-3">
+            <div v-for="(umkm, idx) in analysis.top_umkm" :key="umkm.id" class="flex items-start space-x-3">
+              <div class="h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold" :class="idx === 0 ? 'bg-white/30' : 'bg-white/20'">
+                {{ idx + 1 }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-bold truncate">{{ umkm.name }}</p>
+                <p class="text-[10px] opacity-70 truncate">{{ umkm.category }} • {{ umkm.village_name }}</p>
+              </div>
+              <span class="text-lg font-extrabold" :class="idx === 0 ? 'text-white' : 'text-white/80'">{{ umkm.potential_score }}</span>
+            </div>
           </div>
         </div>
 
@@ -267,25 +261,6 @@
           </div>
         </div>
 
-        <!-- Top 5 UMKM -->
-        <div class="bg-orange-500 rounded-xl p-4 text-white shadow-lg">
-          <h3 class="text-base font-bold flex items-center space-x-2 mb-3">
-            <TrendingUp class="h-4 w-4" />
-            <span>Top 5 Potensi Tertinggi</span>
-          </h3>
-          <div class="space-y-3">
-            <div v-for="(umkm, idx) in analysis.top_umkm" :key="umkm.id" class="flex items-start space-x-3">
-              <div class="h-6 w-6 rounded-full flex items-center justify-center text-xs font-bold" :class="idx === 0 ? 'bg-white/30' : 'bg-white/20'">
-                {{ idx + 1 }}
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-bold truncate">{{ umkm.name }}</p>
-                <p class="text-[10px] opacity-70 truncate">{{ umkm.category }} • {{ umkm.village_name }}</p>
-              </div>
-              <span class="text-lg font-extrabold" :class="idx === 0 ? 'text-white' : 'text-white/80'">{{ umkm.potential_score }}</span>
-            </div>
-          </div>
-        </div>
 
       </div>
     </div>
@@ -310,12 +285,13 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { Store, TrendingUp, Activity, MapPin, BarChart3, PieChart } from 'lucide-vue-next';
-import { Line } from 'vue-chartjs';
+import { Line, Bar } from 'vue-chartjs';
 import {
   Chart as ChartJS,
   LineElement,
   PointElement,
   LineController,
+  BarElement,
   CategoryScale,
   LinearScale,
   Filler,
@@ -324,7 +300,7 @@ import {
 import { useTheme } from '../../composables/useTheme';
 import api from '../../services/api';
 
-ChartJS.register(LineElement, PointElement, LineController, CategoryScale, LinearScale, Filler, Tooltip);
+ChartJS.register(LineElement, PointElement, LineController, BarElement, CategoryScale, LinearScale, Filler, Tooltip);
 
 const { isDark } = useTheme();
 
@@ -470,6 +446,61 @@ const chartOptions = computed(() => ({
     },
   },
   elements: { point: { radius: 2, hoverRadius: 4 } },
+}));
+
+const villageChartData = computed(() => ({
+  labels: sortedVillages.value.map(item => item.name),
+  datasets: [{
+    label: 'Jumlah UMKM',
+    data: sortedVillages.value.map(item => item.umkm_count),
+    backgroundColor: '#F59E0B',
+    hoverBackgroundColor: '#D97706',
+    borderRadius: 6,
+    borderSkipped: false,
+    barPercentage: 0.7,
+    categoryPercentage: 0.8,
+  }],
+}));
+
+const villageChartOptions = computed(() => ({
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      backgroundColor: isDark.value ? '#1A1D1F' : '#ffffff',
+      titleColor: isDark.value ? '#F0F0F0' : '#1e293b',
+      bodyColor: isDark.value ? '#F0F0F0' : '#1e293b',
+      borderColor: isDark.value ? '#2A2E33' : '#e2e8f0',
+      borderWidth: 1,
+      padding: 8,
+      displayColors: false,
+      callbacks: {
+        label: (context: any) => ` ${context.parsed.y} UMKM`,
+      },
+    },
+  },
+  scales: {
+    x: {
+      grid: { display: false },
+      ticks: {
+        color: isDark.value ? '#6F767E' : '#94a3b8',
+        font: { size: 9 },
+        autoSkip: false,
+        maxRotation: 45,
+        minRotation: 45,
+      },
+    },
+    y: {
+      beginAtZero: true,
+      grid: { color: isDark.value ? 'rgba(111, 118, 126, 0.15)' : 'rgba(148, 163, 184, 0.15)' },
+      ticks: {
+        color: isDark.value ? '#6F767E' : '#94a3b8',
+        font: { size: 9 },
+        precision: 0,
+      },
+    },
+  },
 }));
 
 const todayLabel = computed(() => {
